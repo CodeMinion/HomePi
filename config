@@ -1,0 +1,31 @@
+{
+	"homePiId": "HomePiMarkI",
+	"clientInterfaceMac": "00:1A:7D:DA:71:13",
+	"serverInterfaceMac": "00:1A:7D:DA:71:13",
+	"devices": [
+		{
+			"id":"RGBLightBulb",
+			"mac": "B4:99:4C:64:83:2C",
+			"class": "BULB",
+			"category": "BLE",
+			"userId": "Bedroom Lamp 1",
+			"commands": [
+				{"LIGHT_UP" : "none"},
+				{"LIGHT_DOWN" : "none"},
+				{"COLOR_CHANCE" :"byte"}
+			],
+			"interpreter": "ColorificBulbInterpreter"
+		},
+		{
+			"id":"DragonSoldier",
+			"mac":"0C:D2:92:81:16:EE",
+			"class": "BlueMote",
+			"category":"Bluetooth",
+			"userId": "Dragon Soldier BlueMote",
+			"commands": [
+
+			],
+			"interpreter":"BlueMoteInterpreter"
+		}
+	]
+}
