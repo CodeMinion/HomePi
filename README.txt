@@ -56,6 +56,9 @@ Pair with phone/table
 - sudo bluez-simple-agent hci0 30:85:A9:51:D3:06
 - sudo bluez-test-device trusted 30:85:A9:51:D3:06 yes
 
+Restart bluetooth service.
+- sudo invoke-rc.d bluetooth restart
+
 Note: If the HomePi is also connecting to other bluetooth devices you might need to 
 pair those too.
 
@@ -86,3 +89,7 @@ Supported Devices (Interpreters)
 - BlueMote (BlueMoteInterpreter.py) - (https://github.com/CodeMinion/BlueMoteServer)
 
 In order to add support for more bulbs, just add a new interpreter. Currently working on a Roysben interpreter and will release it as soon as it's done. If you make your own interpreter feel free to let me know and I'll add it to the list.    
+
+Keep HomePi running after Disconnect:
+- sudo apt-get-install screen
+- screen ./HomePi.py config_file_path
