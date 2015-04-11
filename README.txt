@@ -9,7 +9,7 @@ Note: There seems to be an issue with the gatttool, so we need to build a newer 
 Download Bluez
 - sudo mkdir bluez
 - cd bluez
-- sudo wget www.kernel.org/pub/linux/bluetooth/bluez-5.11.tar.xz
+- sudo wget www.kernel.org/pub/linux/bluetooth/bluez-5.28.tar.xz
 
 Unzip and Compile Bluez
 - sudo unxz bluez-5.28.tar.xz
