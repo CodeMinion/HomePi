@@ -78,7 +78,7 @@ About the Interpreters:
 - The HomePi has no specific knowledge about the kinds of devices it connects to. The job of the HomePi is to stablish connections with this devices, expose them to the client apps and pass any commands received to the specified device. Aside from that the HomePi is oblivious of how the devices operate. This job is left to the Interpreters. The interpreters behave just like drivers do, they are in change of translating the requests received into something that is understood by the device. For what methods must be implemented by your interpreter refer interpreters/InterpreterTemplate.py. All interpreters must be placed in the interpreter folder because the HomePi will instantiate them from there. 
 
 About controlling your Home Pi:
-- Simply download the Home Pi Remote App from the Google Play store. 
+- Simply download the Home Pi Remote App from the Google Play store. (https://play.google.com/store/apps/details?id=codeminion.homepimote )
 
 About Home Pi:
 - The Home Pi was inspired by the tutorial at Adafuit.com (https://learn.adafruit.com/reverse-engineering-a-bluetooth-low-energy-light-bulb/control-with-bluez).
