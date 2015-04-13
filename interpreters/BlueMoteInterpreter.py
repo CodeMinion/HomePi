@@ -35,6 +35,9 @@ class BlueMoteInterpreter(object):
 	# loss.
 	TIME_OUT = 5 
 
+	# Hibernate command
+	COMMAND_HIBERNATE = 'COMPUTER_HIBERNATE'
+
 	# Constructor
 	def __init__(self, blueMoteServer):
 		self.server = blueMoteServer
@@ -110,6 +113,18 @@ class BlueMoteInterpreter(object):
 		msgLen = len(dataStr)
 		totalSent = 0
 		self.bmSocket.settimeout(self.TIME_OUT)
+		# If we receive the Hibernate Command
+		# the remote server will be put to hibernate
+		# causing a loss in the connection. So
+		# let's signal the device disconnected
+		# right after sending the message.
+		disconnectOnSend = False
+		if self.COMMAND_HIBERNATE in dataStr:
+			disconenctOnSend = True
+			# Prevent PC from Hibernating
+			# for testing.
+			#return - 1
+		
 		try:
 			while totalSent < msgLen:
 
@@ -118,7 +133,7 @@ class BlueMoteInterpreter(object):
 					return -1
 
 				totalSent = totalSent + bytesSent
-	
+
 		except socket.timeout as t:
 			self.bmSocket = None
 			return -1
@@ -129,6 +144,11 @@ class BlueMoteInterpreter(object):
 			# be down. 
 			self.bmSocket = None
 			return -1
+		
+
+		if disconnectOnSend:
+			return -1
+
 		return 0 
 
 	# REQUIRED
