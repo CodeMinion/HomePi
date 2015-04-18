@@ -59,7 +59,7 @@ Pair with phone/table
 Restart bluetooth service.
 - sudo invoke-rc.d bluetooth restart
 
-Note: If the HomePi is also connecting to other bluetooth devices you might need to 
+Note: If the HomePi is also connecting to other Bluetooth devices you might need to 
 pair those too.
 
 Run HomePi
@@ -68,8 +68,9 @@ Run HomePi
 HomePi Setup - Hardware
 1 x Raspberry Pi 2 (https://www.adafruit.com/product/2358)
 2 x Bluetooth Dongles (http://www.adafruit.com/product/1327)
+Total Cost: $67~
 
-Note: I encountered the issue that after my Raspberry Pi had loaded an connected two bluetooth devices it would stop accepting connections from the mobile app. Currently I am dealing with this issue by having two dongles in the Raspberry Pi, one for connecting to the devices (clients dongle), and one two listen for incoming connections from the mobile apps. I purchased my bluetooth module from (http://www.adafruit.com/product/1327) and all came with the exact same MAC address which meant I didn't need to perform any additional settings. If you have two different MACs for your modules make sure to specify their addresses in the config file for the HomePi. 
+Note: I encountered the issue that after my Raspberry Pi had loaded an connected two Bluetooth devices it would stop accepting connections from the mobile app. Currently I am dealing with this issue by having two dongles in the Raspberry Pi, one for connecting to the devices (clients dongle), and one two listen for incoming connections from the mobile apps. I purchased my bluetooth module from (http://www.adafruit.com/product/1327) and all came with the exact same MAC address which meant I didn't need to perform any additional settings. If you have two different MACs for your modules make sure to specify their addresses in the config file for the HomePi. 
 
 About the Config File:
 - The HomePi connects to a series of devices specified by you and makes them available. These devices are specified in the config file that is used at run time by the HomePi. The config file must be in JSON format. For examples of config files I have included two in this release. 
