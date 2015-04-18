@@ -19,7 +19,7 @@
 		
 		{
 			"id":"RGBLightBulb2",
-			"mac": "B4:99:4C:64:84:F3",
+			"mac": "84:DD:20:36:4E:10",
 			"class": "BULB",
 			"category": "BLE",
 			"userId": "Bedroom Lamp 2",
