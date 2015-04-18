@@ -10,20 +10,29 @@
 			"category": "BLE",
 			"userId": "Bedroom Lamp 1",
 			"commands": [
-				{"LIGHT_UP" : "none"},
-				{"LIGHT_DOWN" : "none"},
-				{"COLOR_CHANCE" :"byte"}
+				{"Power" : "none"},
+				{"Dim" : "none"},
+				{"Color" :"none"}
 			],
 			"interpreter": "ColorificBulbInterpreter"
 		},
 		
 		{
 			"id":"RGBLightBulb2",
-			"mac": "84:DD:20:36:4E:10",
+			"mac": "B4:99:4C:64:84:F3",
 			"class": "BULB",
 			"category": "BLE",
 			"userId": "Bedroom Lamp 2",
 			"interpreter": "ColorificBulbInterpreter"
+		},
+		
+		{
+			"id":"RGBBensLight",
+			"mac": "B4:99:4C:5C:2C:35",
+			"class": "BULB",
+			"category": "BLE",
+			"userId": "Bedroom Ceiling Lamp",
+			"interpreter": "RoybensBleBulbInterpreter"
 		},
 		
 		{
@@ -46,16 +55,6 @@
 			"commands":[
 			],
 			"interpreter":"BlueMoteInterpreter"	
-		},
-		{
-			"id": "T10072",
-			"mac": "60:45:BD:D3:4F:59",
-			"class": "BlueMote",
-			"category": "Bluetooth",
-			"userId": "Surface BlueMote",
-			"commands": [
-			],
-			"interpreter": "BlueMoteInterpreter"
 		}
 	]
 }

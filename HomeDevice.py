@@ -130,7 +130,7 @@ class HomeDevice(object): #threading.Thread):
 
 		pass
 
-	# Stop listenining
+	# Stop listening
 	def stopListening(self):
 		self.bRunning
 		pass

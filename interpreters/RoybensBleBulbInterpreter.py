@@ -1,43 +1,42 @@
 import sys
-
 import pexpect
 
 # Implementation of the interpreter to
-# handle communication with a Colorific
-# light bulb. This turns higher level 
-# commands applicable to all light bulbs
-# into low level commands understood by
-# the Colorific light bulb. 
-# Note: Code adapted from the BLE_Colorific.py
-# from AdaFruit. 
+# handle communication with a Roybens
+# Bluetooth Led Bulb.
+# This turns all the Color bulb commands
+# from HomePi into low level commands
+# specific to the bulb.
 
-class ColorificBulbInterpreter(object):
+class RoybensBleBulbInterpreter(object):
 
 	# Device to interact with.
-	bulb = None 
-	# GATT process instance. Used to send 
-	# commands to the bulb
+	bulb = None
+	
+	# GATT process instance used to send commands to the bulb.
 	gatt = None
-
-	# Commands Handled 
+	
+	# Commands Handled
 	COMMAND_COLOR_CHANGE = 'Color'
 	COMMAND_POWER = 'Power'
 	COMMAND_DIM = 'Dim'
 	
-	# Last applied colors
+	#Last colors applied.
 	lastR = 255
 	lastG = 255
 	lastB = 255
-
+	
+	# Last Dim applied
 	lastDim = 255
-	lastOnOff = 1
-
+	
+	# Ignore any command request if we are
+	# still working on executing one command.
 	executingCommand = False
-
+	
 	# Constructor
 	def __init__(self, bulbHomeDev):
 		self.bulb = bulbHomeDev
-
+		
 	# REQUIRED
 	# Attempts to stablish a connection with the 
 	# device. In the event that it fails it 
@@ -56,7 +55,7 @@ class ColorificBulbInterpreter(object):
 				print '{0}'.format
 				return -1
 			
-			print 'Connected to {0} - Colorific Bulb'.format(self.bulb.getDeviceId())
+			print 'Connected to {0} - Roybens LED Bulb'.format(self.bulb.getDeviceId())
 			return 0
 
 		except pexpect.TIMEOUT:
@@ -71,8 +70,9 @@ class ColorificBulbInterpreter(object):
 	# device. 
 	def disconnect(self):
 		self.gatt.close()
-		print 'Disconnected from {0} - Colorific Bulb'.format(self.bulb.getDeviceId())
-	
+		print 'Disconnected from {0} - Roybens LED Bulb'.format(self.bulb.getDeviceId())
+
+		
 	# REQUIRED
 	# Attempts to perform the command on 
 	# the connected device. If the command
@@ -101,19 +101,17 @@ class ColorificBulbInterpreter(object):
 			self.lastB = colorB = int(cmdValsArr[2])
 
 			# Send color change to bulb
-			commandToWrite = self.commandHelper(self.lastOnOff, self.lastDim, self.lastR, self.lastG, self.lastB)
-			#self.gatt.sendline(commandToWrite)
-			# Return success
-			#return 0
+			commandToWrite = self.commandHelper(self.lastDim, self.lastR, self.lastG, self.lastB)
 			return self.sendCommandHelper(commandToWrite)
 
 		elif commandId == self.COMMAND_POWER:
 			offValue = int(commandVals)
-			self.lastOnOff = offValue
-			commandToWrite = self.commandHelper(self.lastOnOff, self.lastDim, self.lastR, self.lastG, self.lastB)
-			#self.gatt.sendline(commandToWrite)
-			#pass
-			#return 0
+			commandToWrite = ''
+			if offValue == 1:
+				commandToWrite = 'char-write-cmd 0x0043 CC2333'
+			else:
+				commandToWrite = 'char-write-cmd 0x0043 CC2433'
+			
 			return self.sendCommandHelper(commandToWrite)
 
 		elif commandId == self.COMMAND_DIM:
@@ -121,16 +119,29 @@ class ColorificBulbInterpreter(object):
 			dimValue = int(commandVals)
 			self.lastDim = dimValue
 			self.lastOnOff = 1
-			commandToWrite = self.commandHelper(self.lastOnOff, self.lastDim, self.lastR, self.lastG, self.lastB)
+			commandToWrite = self.commandHelper(self.lastDim, self.lastR, self.lastG, self.lastB)
 			#print commandToWrite
-			#self.gatt.sendline(commandToWrite)
-			#return 0
 			return self.sendCommandHelper(commandToWrite)
 
 		# If the command is not supported return a 
 		# negative number.	
 		return -1			
-	
+
+	# HELPER METHOD
+	# Helper method to build a command to send.	
+	def commandHelper(self, dim, r, g, b):
+		
+		# This bulb handles dim by using a percentage of the 
+		# active colors, rather than a separate value. 
+		dimPercent = dim / 255.0
+		r = int(r * dimPercent)
+		g = int(g * dimPercent)
+		b = int(b * dimPercent)
+		
+		commandToWrite = 'char-write-cmd 0x0043 56{0:02X}{1:02X}{2:02X}00F0AA'.format(r, g, b)
+		return commandToWrite
+			
+		
 	# HELPER METHOD
 	# Sends a command to the bulb and expects a 
 	# result. Useful for knowing the when bulb
@@ -149,7 +160,6 @@ class ColorificBulbInterpreter(object):
 		self.executingCommand = False
 		return result
 
-		
 	# REQUIRED
 	# Attempts to receive data from the device
 	# It returns the data.
@@ -157,10 +167,3 @@ class ColorificBulbInterpreter(object):
 		# No data received from this device
 		data = ''
 		return
-	
-	# Helper method to build a command to send.	
-	def commandHelper(self, onOff, dim, r, g, b):
-
-		commandToWrite = 'char-write-cmd 0x0028 5801030{0}{1:02X}00{2:02X}{3:02X}{4:02X}'.format(onOff, dim, r, g, b)
-		return commandToWrite
-	

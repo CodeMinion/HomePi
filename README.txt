@@ -93,3 +93,26 @@ In order to add support for more bulbs, just add a new interpreter. Currently wo
 Keep HomePi running after Disconnect:
 - sudo apt-get-install screen
 - screen ./HomePi.py config_file_path
+
+
+Creating your own Interpreters
+In order to create an interpreter for your bulb or BLE devices you will need to get the following:
+- BLE Bulb or device you want to create the interpreter for.
+- BLE Sniffer (I Used https://www.adafruit.com/products/2269)
+- The official app that controls your bulb. 
+
+Adafruit has a nice tutorial on sniffing BLE packets (https://learn.adafruit.com/introducing-the-adafruit-bluefruit-le-sniffer) 
+
+My Approach:
+- Change color to red and record Header and Value from Wireshark.
+- Change color to blue and record Header and Value from Wireshark. 
+- Change color to green and record Header and Value from Wireshark.
+- Change Brightness to 100 and record Header and Value from Wireshark. 
+- Change Brightness to 0 (or as close to it) and record Header and Value from Wireshark. 
+
+That should give you all the information you need to create your interpreter. For light bulbs the commands that the HomePi receives are:
+Color: R,G,B (Range: 0-255)
+Dim: Value (Range: 0-255)
+Power: Value (Range: 0/1)
+
+Note: You can always check out any of the bulb interpreters for a better idea.

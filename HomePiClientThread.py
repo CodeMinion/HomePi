@@ -32,7 +32,7 @@ class HomePiClientThread(threading.Thread):
 				data = self.client.recv(1024)
 				command = '{0}'.format(data)
 				self.piMan.processData(command)	
-				print 'Received: {0}'.format(data)
+				#print 'Received: {0}'.format(data)
 
 		except IOError as e:
 			# When client disconnect the read

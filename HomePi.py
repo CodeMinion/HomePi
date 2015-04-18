@@ -187,7 +187,7 @@ class HomePiManager(object):
 	def connectToRegisteredDevices(self, registeredDevicesList):
 		connectedDevs = {}
 		notConnectedDevs = {}
-		# Attempt to conenct to each registered device
+		# Attempt to connect to each registered device
 		for device in registeredDevicesList:
 			#if device.getDeviceInterpreter().connect() == 0:
 			if device.connect() == 0:
@@ -208,10 +208,10 @@ class HomePiManager(object):
 			device.disconnect()
 
 
-	# Given a list of devices it attempts to disconnet
+	# Given a list of devices it attempts to disconnect
 	# from each device.
 	def disconnectFromRegisteredDevices(self, registeredDevicesList):
-		# Attempt to disconnect from each resgistered device
+		# Attempt to disconnect from each registered device
 		for device in registeredDevicesList:
 			#device.getDeviceInterpreter().disconnect()
 			device.disconnect()
@@ -289,7 +289,7 @@ class HomePiManager(object):
 
 		pass
 
-	# Attempt to disconnect from all conencted clients
+	# Attempt to disconnect from all connected clients
 	def disconnectFromClients(self, connectedClientsThread):
 		for client in connectedClientsThread:
 			client.close()
@@ -418,7 +418,7 @@ class HomePiManager(object):
 		# trying to connect to the unavailable devices.
 		# Removing for now until a better solution comes
 		# to mind.
-		print '\nSpawning Device Checker Thread...'
+		#print '\nSpawning Device Checker Thread...'
 		#self.statusChecker = HomePiDeviceStatusCheckerThread(self, 15)
 		#self.statusChecker.setDaemon(True)
 		#self.statusChecker.start()
