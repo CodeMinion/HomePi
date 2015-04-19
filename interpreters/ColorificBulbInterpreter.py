@@ -120,7 +120,7 @@ class ColorificBulbInterpreter(object):
 			#print 'Dimming Light'
 			dimValue = int(commandVals)
 			self.lastDim = dimValue
-			self.lastOnOff = 1
+			#self.lastOnOff = 1
 			commandToWrite = self.commandHelper(self.lastOnOff, self.lastDim, self.lastR, self.lastG, self.lastB)
 			#print commandToWrite
 			#self.gatt.sendline(commandToWrite)
