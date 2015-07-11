@@ -86,9 +86,11 @@ I also wanted to be able to control all my BLE and Bluetooth devices from a sing
 
 Supported Devices (Interpreters)
 - Colorific Bulb (ColorificBulbInterpreter.py)
+- Roysben Bulb (RoybensBleBulbInterpreter.py)
 - BlueMote (BlueMoteInterpreter.py) - (https://github.com/CodeMinion/BlueMoteServer)
+- MoteDuino (MoteDuinoInterpreter.py) - (https://github.com/CodeMinion/MoteDuinoServer)
 
-In order to add support for more bulbs, just add a new interpreter. Currently working on a Roysben interpreter and will release it as soon as it's done. If you make your own interpreter feel free to let me know and I'll add it to the list.    
+In order to add support for more bulbs, just add a new interpreter. If you make your own interpreter feel free to let me know and I'll add it to the list.    
 
 Keep HomePi running after Disconnect:
 - sudo apt-get-install screen

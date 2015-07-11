@@ -1,7 +1,7 @@
 {
 	"homePiId": "HomePiMarkI",
 	"clientInterfaceMac": "00:1A:7D:DA:71:13",
-        "serverInterfaceMac": "00:1A:7D:DA:71:13",
+    "serverInterfaceMac": "00:1A:7D:DA:71:13",
 	"devices": [
 		{
 			"id":"RGBLightBulb",
@@ -55,6 +55,17 @@
 			"commands":[
 			],
 			"interpreter":"BlueMoteInterpreter"	
+		},
+		{
+			"id": "Sanyo",
+			"mac": "00:00:00:00:00:00",
+			"class": "TV",
+			"category": "Bluetooth",
+			"userId": "Sanyo TV",
+			"commands":[
+			],
+			"interpreter":"MoteDuinoInterpreter"	
 		}
+		
 	]
 }
