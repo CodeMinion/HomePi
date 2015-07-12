@@ -145,7 +145,8 @@ class ColorificBulbInterpreter(object):
 		if result == 0 or result == 1:
 			# Error communicating with bulb
 			 result = -1
-
+			# Clean up Gatt Connection
+			#self.disconnect()
 		self.executingCommand = False
 		return result
 

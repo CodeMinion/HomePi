@@ -40,7 +40,10 @@ class MoteDuinoInterpreter(object):
 	mDataSentSinceKeepAlive = False
 	
 	# Time after which to send a Keep Alive
-	KEEP_ALIVE_DELAY_IN_SECONDS = 60 * 2
+	KEEP_ALIVE_DELAY_IN_SECONDS = 60 * 2 
+
+	# Keep alive timer
+	mKeepAliveTimer = None
 	
 	# Constructor
 	def __init__(self, moteDuinoServer):
@@ -79,6 +82,10 @@ class MoteDuinoInterpreter(object):
 			self.bmSocket.connect((self.bmHost, self.bmPort))
 			print 'SUCCESS: Connected to {0} - MoteDuino'.format(self.server.getDeviceId())
 			#time.sleep(10)
+			# Start Keep Alive
+			self.keepAliveTimerHelper()
+			#self.keepAlive()
+			#self.mKeepAliveTimer.start()
 			return 0
 		except bluetooth.btcommon.BluetoothError as btErr:
 			print btErr
@@ -89,6 +96,7 @@ class MoteDuinoInterpreter(object):
 	# REUIQRED
 	# Attempts to disconnect from the device
 	def disconnect(self):
+		self.mKeepAliveTimer.cancel()
 		self.bmSocket.close();
 		print 'Disconnected from {0} -  MoteDuino'.format(self.server.getDeviceId())
 
@@ -127,10 +135,11 @@ class MoteDuinoInterpreter(object):
 				totalSent = totalSent + bytesSent
 
 		except socket.timeout as t:
+			print 'Timed out'
 			self.bmSocket = None
 			return -1
 		except Exception as ex:
-			#print 'Caught it {0}'.format(type(ex))
+			print 'Caught it {0}'.format(type(ex))
 			# if we have any issues writing to the 
 			# socket it must mean the end point must
 			# be down. 
@@ -156,8 +165,8 @@ class MoteDuinoInterpreter(object):
 	# send an empty line every so often to make sure the 
 	# connection is not closed.
 	def sendKeepAlive(self):
-		retult = self.handleData('')
-		
+		result = self.handleData('')
+		print 'Keep Alive Sent'	
 		return result
 	
 	def keepAlive(self):
@@ -172,7 +181,12 @@ class MoteDuinoInterpreter(object):
 			self.mDataSentSinceKeepAlive = False
 		if result == 0:
 			# schedule next keep alive
-			threading.Timer(KEEP_ALIVE_DELAY_IN_SECONDS, self.keeAlive).start()
+			self.keepAliveTimerHelper()
+			#threading.Timer(self.KEEP_ALIVE_DELAY_IN_SECONDS, self.keepAlive).start()
 		else:
 			# Don't schedule anything connection has been closed
 			pass
+
+	def keepAliveTimerHelper(self):
+		self.mKeepAliveTimer = threading.Timer(self.KEEP_ALIVE_DELAY_IN_SECONDS, self.keepAlive)
+		self.mKeepAliveTimer.start()
