@@ -1,7 +1,8 @@
-import bluetooth
+﻿import bluetooth
 import time
 import socket
 import select
+import threading
 
 # Implementation of the interpreter to 
 # handle communications with the MoteDuino
@@ -35,6 +36,12 @@ class MoteDuinoInterpreter(object):
 	# loss.
 	TIME_OUT = 5 
 
+	# Have we sen't data since our last keep alive.
+	mDataSentSinceKeepAlive = False
+	
+	# Time after which to send a Keep Alive
+	KEEP_ALIVE_DELAY_IN_SECONDS = 60 * 2
+	
 	# Constructor
 	def __init__(self, moteDuinoServer):
 		self.server = moteDuinoServer
@@ -129,6 +136,8 @@ class MoteDuinoInterpreter(object):
 			# be down. 
 			self.bmSocket = None
 			return -1
+	
+		mDataSentSinceKeepAlive = True
 		
 		return 0 
 
@@ -138,3 +147,32 @@ class MoteDuinoInterpreter(object):
 	def receiveData(self):
 		data = self.bmSocket.recv(1024)
 		return data
+
+	
+	# Helper Method
+	# It seems that either the Arduino or the module
+	# close the connection if a couple of hours pass by
+	# without any traffic. So we'll use this method to
+	# send an empty line every so often to make sure the 
+	# connection is not closed.
+	def sendKeepAlive(self):
+		retult = self.handleData('')
+		
+		return result
+	
+	def keepAlive(self):
+		result = 0
+		if self.mDataSentSinceKeepAlive:
+			#do nothing
+			pass
+		else:	
+			result = self.sendKeepAlive()
+			# Since we just sent the flag will be active. 
+			# We don't want to count our sends as traffic.
+			self.mDataSentSinceKeepAlive = False
+		if result == 0:
+			# schedule next keep alive
+			threading.Timer(KEEP_ALIVE_DELAY_IN_SECONDS, self.keeAlive).start()
+		else:
+			# Don't schedule anything connection has been closed
+			pass

@@ -1,4 +1,4 @@
-import bluetooth
+﻿import bluetooth
 import time
 import socket
 import select
@@ -51,12 +51,12 @@ class BlueMoteInterpreter(object):
 		self.bmSocket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 		self.bmSocket.settimeout(None)
 
-                #self.bmPort = bluetooth.PORT_ANY
-                services = bluetooth.find_service(uuid='1d374b6f-4e12-4126-abec-5e92daf7c434', address=self.server.getDeviceMac())
-                if len(services) > 0:
-                        match = services[0]
-                        self.bmPort = match['port']
-                        self.bmHost = match['host']
+		#self.bmPort = bluetooth.PORT_ANY
+		services = bluetooth.find_service(uuid='1d374b6f-4e12-4126-abec-5e92daf7c434', address=self.server.getDeviceMac())
+		if len(services) > 0:
+			match = services[0]
+			self.bmPort = match['port']
+			self.bmHost = match['host']
 		
 	# REQUIRED
 	# Attempts to establish a connection with the
