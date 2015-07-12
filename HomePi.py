@@ -6,6 +6,8 @@ import bluetooth
 import threading
 import sys
 import time
+import subprocess, signal
+import os
 
 from HomeDevice import HomeDevice 
 from HomePiClientThread import HomePiClientThread
@@ -405,8 +407,11 @@ class HomePiManager(object):
 	def init(self, configFile):
 	 	# Create a lock object for synchronization.
 		self.threadLock = threading.Lock()
-	
-		print 'Loading Home Devices...'
+
+		print 'Closing all existing GATT Connections... '
+		self.closeAllGattConnections()	
+		print 'Done'
+		print 'Loading Home Devices... '
 		regDevices = self.loadDevicesJSON(configFile)
 		print 'Done Loading Home Device!'
 		print '\nAttempting connection to devices...'
@@ -511,6 +516,18 @@ class HomePiManager(object):
 		self.threadLock.release()
 		pass
 
+	# This will close all GATT connections that the Raspberry Pi
+	# currently has open. 
+	def closeAllGattConnections(self):
+		ps = subprocess.Popen(['ps', '-A'], stdout=subprocess.PIPE)
+		out, err = ps.communicate()
+
+		for prcLine in out.splitlines():
+			if 'gatttool' in prcLine:
+				pid = int(prcLine.split(None, 1)[0])
+				os.kill(pid, signal.SIGKILL)
+
+		pass
 
 if __name__ == '__main__':
 	piManager = HomePiManager()

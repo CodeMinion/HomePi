@@ -86,9 +86,11 @@ I also wanted to be able to control all my BLE and Bluetooth devices from a sing
 
 Supported Devices (Interpreters)
 - Colorific Bulb (ColorificBulbInterpreter.py)
+- Roysben Bulb (RoybensBleBulbInterpreter.py)
 - BlueMote (BlueMoteInterpreter.py) - (https://github.com/CodeMinion/BlueMoteServer)
+- MoteDuino (MoteDuinoInterpreter.py) - (https://github.com/CodeMinion/MoteDuinoServer)
 
-In order to add support for more bulbs, just add a new interpreter. Currently working on a Roysben interpreter and will release it as soon as it's done. If you make your own interpreter feel free to let me know and I'll add it to the list.    
+In order to add support for more bulbs, just add a new interpreter. If you make your own interpreter feel free to let me know and I'll add it to the list.    
 
 Keep HomePi running after Disconnect:
 - sudo apt-get-install screen
@@ -116,3 +118,12 @@ Dim: Value (Range: 0-255)
 Power: Value (Range: 0/1)
 
 Note: You can always check out any of the bulb interpreters for a better idea.
+
+Pairing with Bluetooth Module (HC-06)
+It seems that in order to pair with the module from the Raspberry Pi you need to run the following commands:
+1 - sudo echo "XX:XX:XX:XX:XX:XX 1234" >> /var/lib/bluetooth/xx:xx:xx:xx:xx:xx/pincodes
+(Where XX represent the address of the BT module and xx are the address of the dongle attached to the Raspberry pi, just press Tab after /var/lib/bluetooth/ to autocomple this)
+2 -  echo 1234 | bluez-simple-agent hci0 XX:XX:XX:XX:XX:XX
+3 -  bluez-test-device trusted XX:XX:XX:XX:XX:XX yes
+After this you should be able to connect.
+   

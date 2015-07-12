@@ -2,11 +2,12 @@
 import time
 import socket
 import select
+import threading
 
 # Implementation of the interpreter to 
-# handle communications with the BlueMote
+# handle communications with the MoteDuino
 # server and the HomePi. The idea is 
-# to have an app implemeting the BlueMote
+# to have an app implementing the MoteDuino
 # protocol connect to the Raspberry Pi 
 # instead of directly to the server. 
 # The goal is to unify all the controls 
@@ -16,7 +17,7 @@ import select
 # this interpreter does is forward the
 # commands to the server. 
 
-class BlueMoteInterpreter(object):
+class MoteDuinoInterpreter(object):
 
 	# Device to interact with
 	server = None
@@ -31,16 +32,22 @@ class BlueMoteInterpreter(object):
 	bmHost = ''
 
 	# Time out in seconds, useful for knowing 
-	# when the operation is hangin due to a socket
+	# when the operation is hanging due to a socket
 	# loss.
 	TIME_OUT = 5 
 
-	# Hibernate command
-	COMMAND_HIBERNATE = 'COMPUTER_HIBERNATE'
+	# Have we sen't data since our last keep alive.
+	mDataSentSinceKeepAlive = False
+	
+	# Time after which to send a Keep Alive
+	KEEP_ALIVE_DELAY_IN_SECONDS = 60 * 2 
 
+	# Keep alive timer
+	mKeepAliveTimer = None
+	
 	# Constructor
-	def __init__(self, blueMoteServer):
-		self.server = blueMoteServer
+	def __init__(self, moteDuinoServer):
+		self.server = moteDuinoServer
 		
 		self.createSocket()
 	
@@ -51,12 +58,12 @@ class BlueMoteInterpreter(object):
 		self.bmSocket = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 		self.bmSocket.settimeout(None)
 
-		#self.bmPort = bluetooth.PORT_ANY
-		services = bluetooth.find_service(uuid='1d374b6f-4e12-4126-abec-5e92daf7c434', address=self.server.getDeviceMac())
-		if len(services) > 0:
-			match = services[0]
-			self.bmPort = match['port']
-			self.bmHost = match['host']
+                # We communicate with the MoteDuino server via SPP
+		services = bluetooth.find_service(uuid='00001101-0000-1000-8000-00805F9B34FB', address=self.server.getDeviceMac())
+                if len(services) > 0:
+                        match = services[0]
+                        self.bmPort = match['port']
+                        self.bmHost = match['host']
 		
 	# REQUIRED
 	# Attempts to establish a connection with the
@@ -72,22 +79,26 @@ class BlueMoteInterpreter(object):
 			if self.bmSocket == None:
 				self.createSocket()
 	
-			#self.bmSocket.connect((self.server.getDeviceMac(), self.bmPort))		
 			self.bmSocket.connect((self.bmHost, self.bmPort))
-			print 'SUCCESS: Connected to {0} - BlueMote'.format(self.server.getDeviceId())
+			print 'SUCCESS: Connected to {0} - MoteDuino'.format(self.server.getDeviceId())
 			#time.sleep(10)
+			# Start Keep Alive
+			self.keepAliveTimerHelper()
+			#self.keepAlive()
+			#self.mKeepAliveTimer.start()
 			return 0
 		except bluetooth.btcommon.BluetoothError as btErr:
 			print btErr
-			print 'FAIL: {0}:{1} - Error trying to connect to BlueMote server. Make sure the Raspberry Pi is paired with it and that the server is running.'.format(self.server.getDeviceId(), self.server.getDeviceMac())
+			print 'FAIL: {0}:{1} - Error trying to connect to MoteDuino server. Make sure the Raspberry Pi is paired with it and that the server is running.'.format(self.server.getDeviceId(), self.server.getDeviceMac())
 			self.bmSocket = None
 			return -1
 
 	# REUIQRED
 	# Attempts to disconnect from the device
 	def disconnect(self):
+		self.mKeepAliveTimer.cancel()
 		self.bmSocket.close();
-		print 'Disconnected from {0} -  BlueMote'.format(self.server.getDeviceId())
+		print 'Disconnected from {0} -  MoteDuino'.format(self.server.getDeviceId())
 
 	# REQUIRED
 	# Attempts to perform the command on
@@ -96,14 +107,14 @@ class BlueMoteInterpreter(object):
 	# number to indicate failure.
 	# Note: This interpreter sits
 	# as an intermediary between the 
-	# BlueMote App and the BlueMote server
+	# MoteDuino App and the MoteDuino server
 	# so interpreter simply forward 
 	# the commands received directly
 	# To the server and performs no other
 	# parsing. 
 	def handleData(self, dataStr):
 		
-		# Sometimes commands are recevied back to 
+		# Sometimes commands are received back to 
 		# back on the same line regardless of the new
 		# line. For now, we just take the first command
 		# and ignore the rest.
@@ -113,18 +124,7 @@ class BlueMoteInterpreter(object):
 		msgLen = len(dataStr)
 		totalSent = 0
 		self.bmSocket.settimeout(self.TIME_OUT)
-		# If we receive the Hibernate Command
-		# the remote server will be put to hibernate
-		# causing a loss in the connection. So
-		# let's signal the device disconnected
-		# right after sending the message.
-		disconnectOnSend = False
-		if self.COMMAND_HIBERNATE in dataStr:
-			disconenctOnSend = True
-			# Prevent PC from Hibernating
-			# for testing.
-			#return - 1
-		
+				
 		try:
 			while totalSent < msgLen:
 
@@ -135,20 +135,19 @@ class BlueMoteInterpreter(object):
 				totalSent = totalSent + bytesSent
 
 		except socket.timeout as t:
+			print 'Timed out'
 			self.bmSocket = None
 			return -1
 		except Exception as ex:
-			#print 'Caught it {0}'.format(type(ex))
+			print 'Caught it {0}'.format(type(ex))
 			# if we have any issues writing to the 
 			# socket it must mean the end point must
 			# be down. 
 			self.bmSocket = None
 			return -1
+	
+		mDataSentSinceKeepAlive = True
 		
-
-		if disconnectOnSend:
-			return -1
-
 		return 0 
 
 	# REQUIRED
@@ -157,3 +156,37 @@ class BlueMoteInterpreter(object):
 	def receiveData(self):
 		data = self.bmSocket.recv(1024)
 		return data
+
+	
+	# Helper Method
+	# It seems that either the Arduino or the module
+	# close the connection if a couple of hours pass by
+	# without any traffic. So we'll use this method to
+	# send an empty line every so often to make sure the 
+	# connection is not closed.
+	def sendKeepAlive(self):
+		result = self.handleData('')
+		print 'Keep Alive Sent'	
+		return result
+	
+	def keepAlive(self):
+		result = 0
+		if self.mDataSentSinceKeepAlive:
+			#do nothing
+			pass
+		else:	
+			result = self.sendKeepAlive()
+			# Since we just sent the flag will be active. 
+			# We don't want to count our sends as traffic.
+			self.mDataSentSinceKeepAlive = False
+		if result == 0:
+			# schedule next keep alive
+			self.keepAliveTimerHelper()
+			#threading.Timer(self.KEEP_ALIVE_DELAY_IN_SECONDS, self.keepAlive).start()
+		else:
+			# Don't schedule anything connection has been closed
+			pass
+
+	def keepAliveTimerHelper(self):
+		self.mKeepAliveTimer = threading.Timer(self.KEEP_ALIVE_DELAY_IN_SECONDS, self.keepAlive)
+		self.mKeepAliveTimer.start()
