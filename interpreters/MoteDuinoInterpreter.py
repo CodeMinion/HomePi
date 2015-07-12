@@ -49,7 +49,7 @@ class MoteDuinoInterpreter(object):
 		self.bmSocket.settimeout(None)
 
                 # We communicate with the MoteDuino server via SPP
-				services = bluetooth.find_service(uuid='00001101-0000-1000-8000-00805F9B34FB', address=self.server.getDeviceMac())
+		services = bluetooth.find_service(uuid='00001101-0000-1000-8000-00805F9B34FB', address=self.server.getDeviceMac())
                 if len(services) > 0:
                         match = services[0]
                         self.bmPort = match['port']
