@@ -40,7 +40,7 @@ class MoteDuinoInterpreter(object):
 	mDataSentSinceKeepAlive = False
 	
 	# Time after which to send a Keep Alive
-	KEEP_ALIVE_DELAY_IN_SECONDS = 60 * 2 
+	KEEP_ALIVE_DELAY_IN_SECONDS = 60 * 60 * 2 
 
 	# Keep alive timer
 	mKeepAliveTimer = None
@@ -166,7 +166,7 @@ class MoteDuinoInterpreter(object):
 	# connection is not closed.
 	def sendKeepAlive(self):
 		result = self.handleData('')
-		print 'Keep Alive Sent'	
+		# print 'Keep Alive Sent'	
 		return result
 	
 	def keepAlive(self):
@@ -187,6 +187,8 @@ class MoteDuinoInterpreter(object):
 			# Don't schedule anything connection has been closed
 			pass
 
+	# Helper to create a timer for sending keep alive to Arduino
+	# and start it. 
 	def keepAliveTimerHelper(self):
 		self.mKeepAliveTimer = threading.Timer(self.KEEP_ALIVE_DELAY_IN_SECONDS, self.keepAlive)
 		self.mKeepAliveTimer.start()
