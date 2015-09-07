@@ -65,6 +65,16 @@
 			"commands":[
 			],
 			"interpreter":"MoteDuinoInterpreter"	
+		},
+		{
+			"id": "R1",
+			"mac": "98:D3:31:70:48:77",
+			"class": "LegaMote",
+			"category": "Bluetooth",
+			"userId": "Bedroom Switch/Lights/Fan",
+			"commands":[
+			],
+			"interpreter":"LegaMoteInterpreter"
 		}
 		
 	]
