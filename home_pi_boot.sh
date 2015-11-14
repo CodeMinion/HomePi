@@ -29,6 +29,13 @@
 # Start bluetooth.
 sudo /etc/init.d/bluetooth restart
 
+# Sleep for now to give the interface time to load.
+# Need a better way to do this.
+sleep 15
+
+# Make HomePi discoverable.
+sudo hciconfig hci0 piscan
+
 # Change to your user home dir.
 cd /
 
