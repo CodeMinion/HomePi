@@ -26,7 +26,8 @@
 # sudo reboot
 #
 
-
+# Start bluetooth.
+sudo /etc/init.d/bluetooth restart
 
 # Change to your user home dir.
 cd /
