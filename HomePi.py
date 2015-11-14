@@ -8,6 +8,10 @@ import sys
 import time
 import subprocess, signal
 import os
+import signal 
+import sys 
+
+import piglow
 
 from HomeDevice import HomeDevice 
 from HomePiClientThread import HomePiClientThread
@@ -120,6 +124,8 @@ class HomePiManager(object):
 	# List of Connected Clients. These are 
 	# PiHome Controllers, like mobile Apps.
 	connectedClients = []
+
+	feedbackGlow = 32
 
 	# Load the JSON HomePi configuration file.
 	# This file contains all the information about
@@ -391,6 +397,13 @@ class HomePiManager(object):
 			print '\nShutting down HomePi!!'
 			self.notifyShutdown()
 			#self.bRunning = False
+			
+			# Feedback - Performing cleanup
+			piglow.blue(0)
+			piglow.red(self.feedbackGlow)
+			piglow.show()
+
+			# Start device disconnect.
 			self.disconnectFromDevices(self.connectedDevices)
 			self.disconnectFromClients(self.connectedClients)		
 			self.notifyShutdown()
@@ -402,18 +415,39 @@ class HomePiManager(object):
 	
 	def shouldRun(self):
 		return self.bRunning
-
+		
 	# Initialize HomePi System
 	def init(self, configFile):
-	 	# Create a lock object for synchronization.
+	 
+		# Set up handler for process termination
+		signal.signal(signal.SIGTERM, onHomePiKilled)
+		signal.signal(signal.SIGINT, onHomePiKilled)
+	
+		# Create a lock object for synchronization.
 		self.threadLock = threading.Lock()
+
+		# Feedback -  Performing cleanup.
+		piglow.red(self.feedbackGlow)
+		piglow.show()
 
 		print 'Closing all existing GATT Connections... '
 		self.closeAllGattConnections()	
 		print 'Done'
+		
+		# Feedback - Performing Config Initialization.
+		piglow.red(0)
+		piglow.orange(self.feedbackGlow)
+		piglow.show()
+
 		print 'Loading Home Devices... '
 		regDevices = self.loadDevicesJSON(configFile)
 		print 'Done Loading Home Device!'
+
+		# Feedback - Connecting to registered devices.
+		piglow.orange(0)
+		piglow.yellow(self.feedbackGlow)
+		piglow.show()
+
 		print '\nAttempting connection to devices...'
 		self.connectToRegisteredDevices(regDevices)
 		print '\nConnection attempt done!'
@@ -428,6 +462,14 @@ class HomePiManager(object):
 		#self.statusChecker.setDaemon(True)
 		#self.statusChecker.start()
 		
+		# Feedback - Ready and waiting for connections.
+		piglow.red(0)
+		piglow.orange(0)
+		piglow.yellow(0)
+
+		piglow.blue(self.feedbackGlow)
+		piglow.show()
+
 		# Listening to devices...	
 		self.listenForClients()
 
@@ -528,6 +570,11 @@ class HomePiManager(object):
 				os.kill(pid, signal.SIGKILL)
 
 		pass
+
+# Handler for KILL of HomePi process
+def onHomePiKilled(signum, frame):
+	piManager.shutdown()
+	sys.exit(0)
 
 if __name__ == '__main__':
 	piManager = HomePiManager()
