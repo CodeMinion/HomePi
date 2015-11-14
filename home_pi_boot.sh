@@ -3,6 +3,9 @@
 # Purpose: Helper script to launch an instance of Home Pi after rebooting
 # the Raspberry Pi. Nice helper for when things go south, just power cycle.
 #
+# Required:
+# Make sure you have the poGlow libraries installed or HomePi won't run.
+#
 # Setup Steps:
 # 1 - Make exucutable 
 # chmod 755 home_pi_boot.sh

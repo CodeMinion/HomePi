@@ -135,6 +135,10 @@ See config files for concrete examples.
 
 PiGlow:
 Integrated with Home Pi with Pimoroni's PiGlow for some visible feedback.
+
+Installing PiGlow:
+- curl get.pimoroni.com/piglow | bash
+
 Language:
 RED    - Performing Home Pi clean up.
 ORANGE - Performing Home Pi configuration. 
