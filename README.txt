@@ -94,7 +94,7 @@ Supported Devices (Interpreters)
 In order to add support for more bulbs, just add a new interpreter. If you make your own interpreter feel free to let me know and I'll add it to the list.    
 
 Keep HomePi running after Disconnect:
-- sudo apt-get-install screen
+- sudo apt-get install screen
 - screen ./HomePi.py config_file_path
 
 
@@ -132,4 +132,20 @@ LegaMote Config:
 For LegaMote the config interpretation was extend to allow naming of the switches as well as having a unique name show in the control screen. Format is as follows.
 userId: "(name to show in main screen)/(name of 1st switch)/(name of 2nd switch)/(and so on..)"
 See config files for concrete examples.
-   
+
+PiGlow:
+Integrated with Home Pi with Pimoroni's PiGlow for some visible feedback.
+
+Installing PiGlow:
+- curl get.pimoroni.com/piglow | bash
+
+Language:
+RED    - Performing Home Pi clean up.
+ORANGE - Performing Home Pi configuration. 
+YELLOW - Performing connection to configured devices.
+BLUE   - Ready!
+
+Start HomePi at Boot:
+Created home_pi_boot.sh to allow the HomePi to be configured to start after Raspberry Pi boots.
+Follow instructions inside the script for setup. 
+     
