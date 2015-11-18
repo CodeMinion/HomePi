@@ -75,6 +75,17 @@
 			"commands":[
 			],
 			"interpreter":"LegaMoteInterpreter"
+		},
+		
+		{
+			"id": "bPoint",
+			"mac": "D0:5F:B8:0F:AC:B9",
+			"class": "LegaMote",
+			"category": "BLE",
+			"userId": "Wall Outlet/Computer",
+			"commands":[
+			],
+			"interpreter": "BPointInterpreter"
 		}
 		
 	]
