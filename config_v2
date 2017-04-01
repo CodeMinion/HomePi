@@ -1,7 +1,7 @@
 {
 	"homePiId": "HomePiMarkI",
 	"clientInterfaceMac": "00:1A:7D:DA:71:13",
-	"serverInterfaceMac": "00:1A:7D:DA:71:13",
+	"serverInterfaceMac": "00:15:83:E5:0E:A2",
 	"devices": [
 		{
 			"id":"RGBLightBulb",
@@ -40,22 +40,24 @@
 			"mac":"0C:D2:92:81:16:EE",
 			"class": "BlueMote",
 			"category":"Bluetooth",
-			"userId": "Dragon Soldier BlueMote",
+			"userId": "Dragon Soldier",
 			"commands": [
 
 			],
 			"interpreter":"BlueMoteInterpreter"
 		},
+		
 		{
 			"id": "CodeLair",
 			"mac": "00:23:4D:EF:16:84",
 			"class": "BlueMote",
 			"category": "Bluetooth",
-			"userId": "Code Lair BlueMote",
+			"userId": "Code Lair",
 			"commands":[
 			],
 			"interpreter":"BlueMoteInterpreter"	
 		},
+		
 		{
 			"id": "Sanyo",
 			"mac": "98:D3:31:90:47:D1",
@@ -84,8 +86,27 @@
                         "userId": "East Cam",
                         "commands": [],
                         "interpreter": "WifiCamInterpreter"
-                }
-
+                },
+		{
+			"id": "bPoint",
+			"mac": "D0:5F:B8:0F:AC:B9",
+			"class": "LegaMote",
+			"category": "BLE",
+			"userId": "Wall Outlet/Computer",
+			"commands":[
+			],
+			"interpreter": "BPointInterpreter"
+		},
+		{
+			"id": "BluRay1",
+			"mac": "98:D3:31:90:5F:C9",
+			"class": "DVD Player",
+			"category": "Bluetooth",
+			"userId" : "Samsung BluRay",
+			"commands": [
+			],
+			"interpreter": "DvDuinoInterpreter"
+		} 
 		
 	]
 }
