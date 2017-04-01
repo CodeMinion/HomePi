@@ -109,6 +109,13 @@ class HomeDevice(object): #threading.Thread):
 
 		pass
 
+	# Attempt to read data from the device.
+	def readData(self):
+		dataRead = self.devInterpreter.receiveData()
+		print 'Data Read - {0}'.format(dataRead)
+		return dataRead
+		pass
+
 	# Handle Data Receive
 	def run(self):
 		try:

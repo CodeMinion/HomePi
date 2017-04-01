@@ -101,6 +101,8 @@ class HomePiManager(object):
 	# Request check on unavaialble devices 
 	# to see if any has become active
 	COMMAND_INFO_UNAVAILABLE = 'upInfo'
+	# Request data read from a given device
+	COMMAND_READ_DATA = 'readData'
 
 	# Device status for connected devices.
 	STATUS_CONNECTED = 'CONNECTED'
@@ -120,6 +122,11 @@ class HomePiManager(object):
 	# Used to let clients know that device information
 	# update is complete
 	INFO_DEV_UPDATE_DONE = 'DEV_UD'
+
+	# Read data tags, used to wrap the device details
+	# about data read from a device to the clients.
+	READ_START = 'READ_START'
+	READ_END = 'READ_END'
 
 	# List of Connected Clients. These are 
 	# PiHome Controllers, like mobile Apps.
@@ -261,14 +268,13 @@ class HomePiManager(object):
 				#self.shutdown()
 				pass
 
-			if command == self. COMMAND_INFO_UNAVAILABLE:
+			if command == self.COMMAND_INFO_UNAVAILABLE:
 				#print '\nChecking unavailable devices...'
 				#self.checkUnavailableDevices()
 				#print '\nDone checking devices!'
 				self.deviceChecker = HomePiDeviceStatusCheckerThread(self)
 				self.deviceChecker.start()
 				pass
-
 
 			# If no receiver Id is present, then the 
 			# command is intended for the HomePi system
@@ -277,15 +283,22 @@ class HomePiManager(object):
 		else:
 			# Find the device to handle this command.
 			if receiverId in self.connectedDevices:	
-				# Make device handle the command.
-				try:
-					self.connectedDevices[receiverId].handleData(command)
-				except IOError as e:	
-					# Device is no longer available
-                        		# Notify HomePi so that it switches
-                        		# it to the unavailable list.
-                        		# TODO
-					pass
+				if command == self.COMMAND_READ_DATA:
+                                	# Read from the device and notify clients
+					dataRead = self.connectedDevices[receiverId].readData();
+					# Notify each client of the data.	
+					self.notifyClientsDataRead(receiverId,dataRead)	
+                                else: 
+
+					# Make device handle the command.
+					try:
+						self.connectedDevices[receiverId].handleData(command)
+					except IOError as e:	
+						# Device is no longer available
+                        			# Notify HomePi so that it switches
+                        			# it to the unavailable list.
+                        			# TODO
+						pass
 			# If we are getting a command for an unavailable device
 			# it probably means that connection was lost but the client
 			# did not receive the status change update.
@@ -356,6 +369,13 @@ class HomePiManager(object):
 	def notifyClients(self, message):
 		for client in self.connectedClients:
 			client.send('{0}\n'.format(message))
+
+	# Notifies client of data read from a device.
+	def notifyClientsDataRead(self, deviceId, data):
+		for client in self.connectedClients:
+			client.send('{0}\n'.format(self.READ_START))
+			client.send('{0}:{1}\n'.format(deviceId, data))
+			client.send('{0}\n'.format(self.READ_END))
 
 	# Notifies clients of HomePi shutdown.
 	def notifyShutdown(self):
