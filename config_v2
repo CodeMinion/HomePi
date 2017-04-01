@@ -75,7 +75,17 @@
 			"commands":[
 			],
 			"interpreter":"LegaMoteInterpreter"
-		}
+		},
+		{
+                        "id": "wifiCam1",
+                        "mac":"192.168.1.75@8081@ATT9NMu8Il",
+                        "class": "SecCam",
+                        "category":"WiFi",
+                        "userId": "East Cam",
+                        "commands": [],
+                        "interpreter": "WifiCamInterpreter"
+                }
+
 		
 	]
 }
