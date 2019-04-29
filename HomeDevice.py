@@ -104,7 +104,8 @@ class HomeDevice(object): #threading.Thread):
 		# the socket is probably closed.
 		if retVal < 0:
 			#print 'Devices Lost- {0}'.format(self.getDeviceMac())
-			self.devListener.onDeviceDisconnected(self)
+			#self.devListener.onDeviceDisconnected(self)
+			self.notifyDeviceDisconnected()
 		#print 'Dev Returned: {0}'.format(retVal)
 
 		pass
@@ -128,13 +129,26 @@ class HomeDevice(object): #threading.Thread):
 					continue
 				
 				# Notify listener of data received
-				self.devListener.onDeviceDataReceived(self, data)
+				#self.devListener.onDeviceDataReceived(self, data)
+				notifyDataReceived(data)
 		except IOError as e:
 			# Device was disconnected
-			# Let listner know
+			# Let listener know
 			self.devListener.onDeviceDisconnected(self)
 			pass
 
+		pass
+	
+	# Used to notify the listener that this device has
+	# disconnected. 
+	def notifyDeviceDisconnected(self):
+		self.devListener.onDeviceDisconnected(self)
+		pass
+	
+	# Used to notify the listener that the device 
+	# has received data. 
+	def notifyDataReceived(self, data):
+		self.devListener.onDeviceDataReceived(self, data)
 		pass
 
 	# Stop listening
