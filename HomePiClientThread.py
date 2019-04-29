@@ -1,6 +1,6 @@
 import bluetooth
 import threading
-
+import struct
 # Client thread, handles each connected 
 # client to the HomePi. This will take 
 # care of receiving the commands from the 
@@ -47,7 +47,17 @@ class HomePiClientThread(threading.Thread):
 	# Send data back to the client. 	
 	def send(self, data):
 		try:
-			self.client.send(data)
+			totalSent = 0
+			msgLen = len(data)
+			dataToSend = struct.pack('4B', msgLen) + data
+			toSendLen = len(dataToSend)
+			while totalSent < toSendLen:
+				sent = self.client.send(dataToSend[totalSent:])
+				if sent == 0:
+					#Handle Network Error
+					pass
+				totalSent = totalSent + sent
+				
 		except IOError as e:
 			pass
 
