@@ -49,7 +49,7 @@ class HomePiClientThread(threading.Thread):
 		try:
 			totalSent = 0
 			msgLen = len(data)
-			dataToSend = struct.pack('4B', msgLen) + data
+			dataToSend = struct.pack('<i', msgLen) + data
 			toSendLen = len(dataToSend)
 			while totalSent < toSendLen:
 				sent = self.client.send(dataToSend[totalSent:])

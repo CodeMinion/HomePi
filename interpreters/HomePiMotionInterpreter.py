@@ -125,7 +125,7 @@ class HomePiMotionInterpreter(DefaultDelegate):
 			
 			#print "Motion Value: {0}".format(self.currentMotion)
 			
-			data = "{0}:{1}".format(self.DATA_KEY_MOTION_VAL, self.currentMotion)
+			data = "{0},{1}".format(self.DATA_KEY_MOTION_VAL, self.currentMotion)
 			
 			# Notify client
 			self.motionSensor.notifyDataReceived(data)
