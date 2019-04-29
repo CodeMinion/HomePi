@@ -16,8 +16,8 @@ class HomePiMotionInterpreter(DefaultDelegate):
 	home_sensing_service_uuid = "000028FF-0000-1000-8000-00805F9B34FB"
 	motion_sensing_characteristic_uuid = "00004A37-0000-1000-8000-00805F9B34FB"
 
-	battery_service_uuid = "0000180F-0000-1000-8000-00805F9B34FB"
-	battery_level_characteristic_uuid = "00002A19-0000-1000-8000-00805F9B34FB"
+	battery_service_uuid = 0x180F
+	battery_level_characteristic_uuid = 0x2A19
 
 	home_sensing_service = None
 	motion_sensing_characteristic = None
@@ -65,7 +65,7 @@ class HomePiMotionInterpreter(DefaultDelegate):
 			ccc_desc.write(setup_data)
 	
 			self.battery_service = self.motionSensorPeripheral.getServiceByUUID(self.battery_service_uuid)
-			self.battery_level_characteristic = self.home_sensing_service.getCharacteristics(self.battery_level_characteristic_uuid)[0]
+			self.battery_level_characteristic = self.battery_service.getCharacteristics(self.battery_level_characteristic_uuid)[0]
 	
 			# Enable notifications 
 			ccc_desc = self.battery_level_characteristic.getDescriptors(forUUID=0x2902)[0]
@@ -145,7 +145,7 @@ class HomePiMotionInterpreter(DefaultDelegate):
 			pass
 			
 		elif(self.battery_level_characteristic.getHandle() == cHandle):
-			unpackedTuple = unpack('<bb', data)
+			unpackedTuple = unpack('<b', data)
 			battValue = unpackedTuple[0]
 			
 			data = "{0},{1}".format(self.DATA_KEY_BATTERY_VAL, battValue)
