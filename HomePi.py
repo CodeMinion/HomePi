@@ -284,12 +284,11 @@ class HomePiManager(object):
 			# Find the device to handle this command.
 			if receiverId in self.connectedDevices:	
 				if command == self.COMMAND_READ_DATA:
-                                	# Read from the device and notify clients
+                    # Read from the device and notify clients
 					dataRead = self.connectedDevices[receiverId].readData();
 					# Notify each client of the data.	
 					self.notifyClientsDataRead(receiverId,dataRead)	
-                                else: 
-
+				else: 
 					# Make device handle the command.
 					try:
 						self.connectedDevices[receiverId].handleData(command)
@@ -540,6 +539,7 @@ class HomePiManager(object):
 	# Gets called when a device receives data. 
 	def onDeviceDataReceived(self, device, deviceData):
 		print 'Data - {0} - From {1}'.format(deviceData, device.getDeviceMac())
+		self.notifyClientsDataRead(device.getDeviceId(),deviceData)	
 		pass
 
 	
