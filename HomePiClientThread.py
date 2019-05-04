@@ -29,7 +29,20 @@ class HomePiClientThread(threading.Thread):
 	def run(self):
 		try:
 			while self.bRunning:
-				data = self.client.recv(1024)
+			
+				msgSizeBytes = self.client.recv(4)
+				msgSize = struct.unpack('<i', msgSizeBytes)
+				chunks = []
+				bytes_received = 0
+				while bytes_received < msgSize:
+					chunk = self.client.recv(min(msgSize - bytes_received, 1024))
+					bytes_received = bytes_received + len(chunk)
+					if chunk == b'':
+						#TODO  Handle Network Error
+						pass
+					chunks.append(chunk)
+							
+				data = b''.join(chunks)#self.client.recv(1024)
 				command = '{0}'.format(data)
 				self.piMan.processData(command)	
 				#print 'Received: {0}'.format(data)
@@ -54,7 +67,7 @@ class HomePiClientThread(threading.Thread):
 			while totalSent < toSendLen:
 				sent = self.client.send(dataToSend[totalSent:])
 				if sent == 0:
-					#Handle Network Error
+					#TODO Handle Network Error
 					pass
 				totalSent = totalSent + sent
 				
