@@ -31,8 +31,7 @@ class HomePiClientThread(threading.Thread):
 			while self.bRunning:
 			
 				msgSizeBytes = self.client.recv(4)
-				# Bytes from Android in Big-Endian
-				msgSize = struct.unpack('>i', msgSizeBytes)[0]
+				msgSize = struct.unpack('<i', msgSizeBytes)[0]
 				chunks = []
 				bytes_received = 0
 				while bytes_received < msgSize:
