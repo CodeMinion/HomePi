@@ -45,7 +45,7 @@ cd /home/pi/HomePi
 
 # Run HomePi with your configuration.
 # Note: You might want to tweak this for your config file.
-sudo screen -m -d ./HomePi.py config_v2 
+sudo screen -m -d ./HomePi.py /boot/home_pi_config 
 
 # Go back.
 cd /

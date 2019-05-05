@@ -176,7 +176,7 @@ class HomePiManager(object):
 	def loadDevicesJSON(self, configPath):
 		
 		# Read from jason config file
-		json_data = loadConfigHelper(configPath, configPath+self.configFileTempExt)
+		json_data = self.loadConfigHelper(configPath, configPath+self.configFileTempExt)
 		
 		# Get This PiHome Id
 		self.homePiId = json_data['homePiId']
