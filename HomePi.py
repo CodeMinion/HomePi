@@ -10,8 +10,10 @@ import subprocess, signal
 import os
 import signal 
 import sys 
+from shutil import copyfile
 
 import piglow
+
 
 from HomeDevice import HomeDevice 
 from HomePiClientThread import HomePiClientThread
@@ -26,6 +28,10 @@ class HomePiManager(object):
 	# Lock
 	threadLock = None
 
+	# Path used to configure the HomePi
+	configFilePath = None 
+	configFileTempExt=".swp"
+	
 	# Home Pi Id. Used to indentify
 	# with other HomePi
 	homePiId = ''
@@ -103,6 +109,8 @@ class HomePiManager(object):
 	COMMAND_INFO_UNAVAILABLE = 'upInfo'
 	# Request data read from a given device
 	COMMAND_READ_DATA = 'readData'
+	# Request the PI to configure itself with the provided configuration data.
+	COMMAND_CONFIG_PI = 'configPi'
 
 	# Device status for connected devices.
 	STATUS_CONNECTED = 'CONNECTED'
@@ -122,6 +130,8 @@ class HomePiManager(object):
 	# Used to let clients know that device information
 	# update is complete
 	INFO_DEV_UPDATE_DONE = 'DEV_UD'
+	# Used to let clients know that configuration is done
+	INFO_CONFIG_DONE = 'CONFIG_END'
 
 	# Read data tags, used to wrap the device details
 	# about data read from a device to the clients.
@@ -134,17 +144,39 @@ class HomePiManager(object):
 
 	feedbackGlow = 32
 
+	def loadConfigHelper(self, configPath, prevConfig):
+	
+		try:
+			# Read from Json config file
+			json_file = open(configPath)
+			# Parse JSON data
+			json_data = json.load(json_file)
+			# Close file
+			json_file.close()
+			return json_data
+			
+		except JSONDecodeError as e:
+			print "Corrupted Config File! Attempting to configure with last saved file..."
+			# Read from Json config file
+			json_file = open(prevConfig)
+			# Parse JSON data
+			json_data = json.load(json_file)
+			# Close file
+			json_file.close()
+			return json_data
+			
+			pass
+		
+		pass
+		
 	# Load the JSON HomePi configuration file.
 	# This file contains all the information about
 	# all the devices that will be handled by the 
 	# HomePi System.
 	def loadDevicesJSON(self, configPath):
+		
 		# Read from jason config file
-		json_file = open(configPath)
-		# Parse JSON data
-		json_data = json.load(json_file)
-		# Close file
-		json_file.close()
+		json_data = self.loadConfigHelper(configPath, configPath+self.configFileTempExt)
 		
 		# Get This PiHome Id
 		self.homePiId = json_data['homePiId']
@@ -268,7 +300,7 @@ class HomePiManager(object):
 				#self.shutdown()
 				pass
 
-			if command == self.COMMAND_INFO_UNAVAILABLE:
+			elif command == self.COMMAND_INFO_UNAVAILABLE:
 				#print '\nChecking unavailable devices...'
 				#self.checkUnavailableDevices()
 				#print '\nDone checking devices!'
@@ -276,6 +308,21 @@ class HomePiManager(object):
 				self.deviceChecker.start()
 				pass
 
+			elif command.startswith(self.COMMAND_CONFIG_PI):
+				# Handle the Configuration
+				configData = command[len(self.COMMAND_CONFIG_PI):]
+				# Create a temp file with the old config
+				copyfile(self.configFilePath, self.configFilePath+self.configFileTempExt)
+				# Copy the config to the current location.
+				configFile = open(self.configFilePath, "w")
+				configFile.write(configData)
+				configFile.close()
+				# TODO Notify clients of Configuration Complete.
+				cmdLine = '{0}'.format(self.INFO_CONFIG_DONE)
+				self.notifyClients(cmdLine)	
+				# Reboot device 
+				os.system("sudo reboot")
+				pass
 			# If no receiver Id is present, then the 
 			# command is intended for the HomePi system
 			# itself. Handle it here.
@@ -437,7 +484,10 @@ class HomePiManager(object):
 		
 	# Initialize HomePi System
 	def init(self, configFile):
-	 
+
+		# Track the file used to configure the current instance
+		self.configFilePath = configFile 
+		
 		# Set up handler for process termination
 		signal.signal(signal.SIGTERM, onHomePiKilled)
 		signal.signal(signal.SIGINT, onHomePiKilled)
