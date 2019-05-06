@@ -183,6 +183,9 @@ class HomePiManager(object):
 			# No Config file found this means that this is a new HomePi. 
 			# Generate a default config file to allow connection by the clients.
 			json_data = self.generateDefaultConfig()
+			# Store it as the current config
+			with open(self.configFilePath, "w+") as configFile:
+				configFile.write(json.dumps(json_data))
 			return json_data
 			
 		pass
@@ -344,7 +347,7 @@ class HomePiManager(object):
 				# Create a temp file with the old config
 				copyfile(self.configFilePath, self.configFilePath+self.configFileTempExt)
 				# Copy the config to the current location.
-				configFile = open(self.configFilePath, "w")
+				configFile = open(self.configFilePath, "w+")
 				configFile.write(configData)
 				configFile.close()
 				# TODO Notify clients of Configuration Complete.
