@@ -144,6 +144,7 @@ class HomePiManager(object):
 	KEY_CLIENT_INTERFACE_MAC = 'clientInterfaceMac'
 	KEY_SERVER_INTERFACE_MAC = 'serverInterfaceMac'
 	KEY_DEVICES = 'devices'
+	KEY_HOME_PI_ID = 'homePiId'
 	# TODO Add missing keys 
 	
 	# List of Connected Clients. These are 
@@ -168,7 +169,7 @@ class HomePiManager(object):
 			json_file.close()
 			return json_data
 			
-		except JSONDecodeError as e:
+		except ValueError as e: #JSONDecodeError as e:
 			print "Corrupted Config File! Attempting to configure with last saved file..."
 			# Read from Json config file
 			json_file = open(prevConfig)
@@ -178,10 +179,10 @@ class HomePiManager(object):
 			json_file.close()
 			return json_data
 			
-		except as IOError as e:
+		except IOError as e:
 			# No Config file found this means that this is a new HomePi. 
 			# Generate a default config file to allow connection by the clients.
-			json_data = generateDefaultConfig()
+			json_data = self.generateDefaultConfig()
 			return json_data
 			
 		pass
@@ -190,12 +191,12 @@ class HomePiManager(object):
 	# Hci0 as the default interface for the mobile client connection. 
 	# It also has an empty list of devices. 
 	def generateDefaultConfig(self):
-		json_data = json.dumps({})
+		json_data = {}
 		macs = self.getHomePiBluetoothInterfaces()
+		json_data[self.KEY_HOME_PI_ID] = "HomePi"
 		json_data[self.KEY_CLIENT_INTERFACE_MAC] = macs[0]
 		json_data[self.KEY_SERVER_INTERFACE_MAC] = macs[1]
 		json_data[self.KEY_DEVICES] = []
-		
 		return json_data	
 	
 	# Load the JSON HomePi configuration file.
