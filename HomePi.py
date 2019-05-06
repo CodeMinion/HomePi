@@ -10,6 +10,8 @@ import subprocess, signal
 import os
 import signal 
 import sys 
+import commands
+
 from shutil import copyfile
 
 import piglow
@@ -138,12 +140,23 @@ class HomePiManager(object):
 	READ_START = 'READ_START'
 	READ_END = 'READ_END'
 
+	# JSON Keys
+	KEY_CLIENT_INTERFACE_MAC = 'clientInterfaceMac'
+	KEY_SERVER_INTERFACE_MAC = 'serverInterfaceMac'
+	KEY_DEVICES = 'devices'
+	# TODO Add missing keys 
+	
 	# List of Connected Clients. These are 
 	# PiHome Controllers, like mobile Apps.
 	connectedClients = []
 
 	feedbackGlow = 32
 
+	# Helper to load the configuraiton file.
+	# If the configuration no configuration file is available
+	# a default file will be loaded. 
+	# If a corrupted or invalid config is found it will try to 
+	# load the last correct configuration file if any. 
 	def loadConfigHelper(self, configPath, prevConfig):
 	
 		try:
@@ -165,10 +178,26 @@ class HomePiManager(object):
 			json_file.close()
 			return json_data
 			
-			pass
-		
+		except as IOError as e:
+			# No Config file found this means that this is a new HomePi. 
+			# Generate a default config file to allow connection by the clients.
+			json_data = generateDefaultConfig()
+			return json_data
+			
 		pass
+
+	# Generates a default configuration file which contains 
+	# Hci0 as the default interface for the mobile client connection. 
+	# It also has an empty list of devices. 
+	def generateDefaultConfig(self):
+		json_data = json.dumps({})
+		macs = self.getHomePiBluetoothInterfaces()
+		json_data[self.KEY_CLIENT_INTERFACE_MAC] = macs[0]
+		json_data[self.KEY_SERVER_INTERFACE_MAC] = macs[1]
+		json_data[self.KEY_DEVICES] = []
 		
+		return json_data	
+	
 	# Load the JSON HomePi configuration file.
 	# This file contains all the information about
 	# all the devices that will be handled by the 
@@ -640,6 +669,23 @@ class HomePiManager(object):
 				os.kill(pid, signal.SIGKILL)
 
 		pass
+	
+	# Requests the MAC Addresses of the Bluetooth adapters.
+	# @returns A tubple containg clientMac, serverMac. 
+	def getHomePiBluetoothInterfaces(self):
+		# MAC used to connect peripherals. 
+		clientMac = self.getBtInterfaceMac("hci1")
+		# MAC used to listener for mobile clients. 
+		serverMac = self.getBtInterfaceMac("hci0")
+		return (clientMac, serverMac)
+		
+		
+	# Helper function to retreive device the PI BT MAC	
+	def getBtInterfaceMac(self, interfaceId):
+		cmd = "hciconfig"
+		status, output = commands.getstatusoutput(cmd)
+		btMac = output.split("{}:".format(interfaceId))[1].split("BD Address: ")[1].split(" ")[0].strip()
+		return btMac
 
 # Handler for KILL of HomePi process
 def onHomePiKilled(signum, frame):
