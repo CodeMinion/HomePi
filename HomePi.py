@@ -214,17 +214,24 @@ class HomePiManager(object):
 		# Get This PiHome Id
 		self.homePiId = json_data['homePiId']
 
+		# Replace Mac Addresses with system addresses. 
+		# Note: Users will no longer have to specify these values 
+		# because will get them from the system
+		macs = self.getHomePiBluetoothInterfaces()
+		json_data[self.KEY_CLIENT_INTERFACE_MAC] = macs[0]
+		json_data[self.KEY_SERVER_INTERFACE_MAC] = macs[1]
+		
 		# Get the Mac for the interface to use to connect 
 		# with registered devices.
-		self.clientInterfaceMac = json_data['clientInterfaceMac']
+		self.clientInterfaceMac = json_data[self.KEY_CLIENT_INTERFACE_MAC]
 			
 		# Get the Mac for the interface to use to listen for
 		# clients.
-		self.serverInterfaceMac = json_data['serverInterfaceMac']
+		self.serverInterfaceMac = json_data[self.KEY_SERVER_INTERFACE_MAC]
 
 
 		# Get devices in JSON config
-		json_devs = json_data['devices']
+		json_devs = json_data[self.KEY_DEVICES]
 	
 		# List of registered devices in the HomePi
 		self.registeredDevices = []
@@ -353,6 +360,8 @@ class HomePiManager(object):
 				# TODO Notify clients of Configuration Complete.
 				cmdLine = '{0}'.format(self.INFO_CONFIG_DONE)
 				self.notifyClients(cmdLine)	
+				# Do any any clean up needed for shutdown. 
+				self.shutdown()
 				# Reboot device 
 				os.system("sudo reboot")
 				pass
@@ -508,9 +517,14 @@ class HomePiManager(object):
 			self.notifyShutdown()
 			self.btServerSocket.close()
 			print '\nServer Socket Closed'
+			time.sleep(3)
+		
 		except bluetooth.btcommon.BluetoothError:
 			pass
 
+	def shufdownHelper(self):
+		piglow.off()
+	pass
 	
 	def shouldRun(self):
 		return self.bRunning
