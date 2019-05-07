@@ -360,6 +360,8 @@ class HomePiManager(object):
 				# TODO Notify clients of Configuration Complete.
 				cmdLine = '{0}'.format(self.INFO_CONFIG_DONE)
 				self.notifyClients(cmdLine)	
+				# Do any any cleanup needed for shutdown. 
+				self.shutdown()
 				# Reboot device 
 				os.system("sudo reboot")
 				pass
@@ -514,10 +516,14 @@ class HomePiManager(object):
 			self.disconnectFromClients(self.connectedClients)		
 			self.notifyShutdown()
 			self.btServerSocket.close()
+			shufdownHelper()
 			print '\nServer Socket Closed'
 		except bluetooth.btcommon.BluetoothError:
 			pass
 
+	def shufdownHelper(self):
+		piglow.off()
+	pass
 	
 	def shouldRun(self):
 		return self.bRunning
