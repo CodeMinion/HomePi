@@ -113,6 +113,8 @@ class HomePiManager(object):
 	COMMAND_READ_DATA = 'readData'
 	# Request the PI to configure itself with the provided configuration data.
 	COMMAND_CONFIG_PI = 'configPi'
+	# Request the PI To configure wifi. 
+	COMMAND_CONFIG_WIFI = 'configWifi'
 
 	# Device status for connected devices.
 	STATUS_CONNECTED = 'CONNECTED'
@@ -134,6 +136,8 @@ class HomePiManager(object):
 	INFO_DEV_UPDATE_DONE = 'DEV_UD'
 	# Used to let clients know that configuration is done
 	INFO_CONFIG_DONE = 'CONFIG_END'
+	# Used to notify the client that wifi configuration is over.
+	INFO_CONFIG_WIFI_DONE = 'CONFIG_WIFI_END'
 
 	# Read data tags, used to wrap the device details
 	# about data read from a device to the clients.
@@ -145,6 +149,9 @@ class HomePiManager(object):
 	KEY_SERVER_INTERFACE_MAC = 'serverInterfaceMac'
 	KEY_DEVICES = 'devices'
 	KEY_HOME_PI_ID = 'homePiId'
+	KEY_WIFI_SSID = 'ssid'
+	KEY_WIFI_PSK = 'psk'
+	
 	# TODO Add missing keys 
 	
 	# List of Connected Clients. These are 
@@ -365,6 +372,29 @@ class HomePiManager(object):
 				# Reboot device 
 				os.system("sudo reboot")
 				pass
+			
+			elif command.startswith(self.COMMAND_CONFIG_WIFI):
+				configData= command[len(self.COMMAND_CONFIG_WIFI):]
+				json_data = json.loads(configData)
+				ssid = json_data[self.KEY_WIFI_SSID]
+				psk = json_data[self.KEY_WIFI_PSK]
+				# TODO Execute wpa_passphrase
+				cmd = "wpa_passphrase {0} {1} >> /etc/wpa_supplicant/wpa_supplicant.conf".format(ssid, psk)
+				status, output = commands.getstatusoutput(cmd)
+				
+				if status == 0:
+					# Restart wifi 
+					cmd = "systemctl daemon-reload"
+					status, output = commands.getstatusoutput(cmd)
+					cmd = "systemctl restart dhcpcd"
+					status, output = commands.getstatusoutput(cmd)
+					cmdLine = '{0}'.format(self.INFO_CONFIG_WIFI_DONE)
+					self.notifyClients(cmdLine)	
+				
+				else: 
+					print "Error Configuring Wifi" 
+					# TODO Notify Wifi Config Failed
+				pass
 			# If no receiver Id is present, then the 
 			# command is intended for the HomePi system
 			# itself. Handle it here.
@@ -383,9 +413,9 @@ class HomePiManager(object):
 						self.connectedDevices[receiverId].handleData(command)
 					except IOError as e:	
 						# Device is no longer available
-                        			# Notify HomePi so that it switches
-                        			# it to the unavailable list.
-                        			# TODO
+                        # Notify HomePi so that it switches
+                        # it to the unavailable list.
+                        # TODO
 						pass
 			# If we are getting a command for an unavailable device
 			# it probably means that connection was lost but the client
