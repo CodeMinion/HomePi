@@ -384,13 +384,10 @@ class HomePiManager(object):
 				
 				if status == 0:
 					# Restart wifi 
-					cmd = "systemctl daemon-reload"
-					status, output = commands.getstatusoutput(cmd)
-					cmd = "systemctl restart dhcpcd"
+					cmd = "wpa_cli -i wlan0 reconfigure"
 					status, output = commands.getstatusoutput(cmd)
 					cmdLine = '{0}'.format(self.INFO_CONFIG_WIFI_DONE)
 					self.notifyClients(cmdLine)	
-				
 				else: 
 					print "Error Configuring Wifi" 
 					# TODO Notify Wifi Config Failed
