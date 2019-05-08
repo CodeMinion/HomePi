@@ -115,6 +115,8 @@ class HomePiManager(object):
 	COMMAND_CONFIG_PI = 'configPi'
 	# Request the PI To configure wifi. 
 	COMMAND_CONFIG_WIFI = 'configWifi'
+	# Request to update the HomePi firmware.
+	COMMAND_UPDATE_FIRMWARE = 'updateFirmware'
 
 	# Device status for connected devices.
 	STATUS_CONNECTED = 'CONNECTED'
@@ -138,7 +140,9 @@ class HomePiManager(object):
 	INFO_CONFIG_DONE = 'CONFIG_END'
 	# Used to notify the client that wifi configuration is over.
 	INFO_CONFIG_WIFI_DONE = 'CONFIG_WIFI_END'
-
+	# Used to notify the client that the firmware update is done.
+	INFO_FIRMWARE_UPDATE_DONE = 'FIRMWARE_UPDATE_DONE'
+	
 	# Read data tags, used to wrap the device details
 	# about data read from a device to the clients.
 	READ_START = 'READ_START'
@@ -364,7 +368,7 @@ class HomePiManager(object):
 				configFile = open(self.configFilePath, "w+")
 				configFile.write(configData)
 				configFile.close()
-				# TODO Notify clients of Configuration Complete.
+				# Notify clients of Configuration Complete.
 				cmdLine = '{0}'.format(self.INFO_CONFIG_DONE)
 				self.notifyClients(cmdLine)	
 				# Do any any clean up needed for shutdown. 
@@ -395,6 +399,22 @@ class HomePiManager(object):
 			# If no receiver Id is present, then the 
 			# command is intended for the HomePi system
 			# itself. Handle it here.
+			pass
+			
+			elif command === COMMAND_UPDATE_FIRMWARE:
+				firmware_branch = "master"
+				firmware_remote = "origin"
+				cmd = "git pull {0} {1}".format(firmware_remote, firmware_branch)
+				status, output = commands.getstatusoutput(cmd)
+				# TODO Handle the status to better notify the users
+				# Notify clients of Configuration Complete.
+				cmdLine = '{0}'.format(self.INFO_FIRMWARE_UPDATE_DONE)
+				self.notifyClients(cmdLine)	
+				# Do any any clean up needed for shutdown. 
+				self.shutdown()
+				# Reboot device 
+				os.system("sudo reboot")
+				
 			pass
 		else:
 			# Find the device to handle this command.
