@@ -396,12 +396,7 @@ class HomePiManager(object):
 					print "Error Configuring Wifi" 
 					# TODO Notify Wifi Config Failed
 				pass
-			# If no receiver Id is present, then the 
-			# command is intended for the HomePi system
-			# itself. Handle it here.
-			pass
-			
-			elif command === COMMAND_UPDATE_FIRMWARE:
+			elif command == self.COMMAND_UPDATE_FIRMWARE:
 				firmware_branch = "master"
 				firmware_remote = "origin"
 				cmd = "git pull {0} {1}".format(firmware_remote, firmware_branch)
@@ -414,8 +409,14 @@ class HomePiManager(object):
 				self.shutdown()
 				# Reboot device 
 				os.system("sudo reboot")
+				pass
 				
+			# If no receiver Id is present, then the 
+			# command is intended for the HomePi system
+			# itself. Handle it here.
 			pass
+			
+			
 		else:
 			# Find the device to handle this command.
 			if receiverId in self.connectedDevices:	
