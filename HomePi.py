@@ -399,7 +399,7 @@ class HomePiManager(object):
 			elif command == self.COMMAND_UPDATE_FIRMWARE:
 				firmware_branch = "master"
 				firmware_remote = "origin"
-				cmd = "git pull {0} {1}".format(firmware_remote, firmware_branch)
+				cmd = "git pull -r {0} {1}".format(firmware_remote, firmware_branch)
 				status, output = commands.getstatusoutput(cmd)
 				# TODO Handle the status to better notify the users
 				# Notify clients of Configuration Complete.
