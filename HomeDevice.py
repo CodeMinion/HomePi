@@ -159,8 +159,8 @@ class HomeDevice(object): #threading.Thread):
 
 	# Creates a pair record for the device and the HomePi
 	def pairDevice(self, pinCode):
-		cmd = 'sudo echo "{0} {1}" >> /var/lib/bluetooth/{2}/pincodes'.format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
-		status, output = commands.getstatusoutput(cmd)
+		#cmd = 'sudo echo "{0} {1}" >> /var/lib/bluetooth/{2}/pincodes'.format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
+		#status, output = commands.getstatusoutput(cmd)
 		cmd = "./bluetoothPair.sh {0} {1} {2}".format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
 		status, output = commands.getstatusoutput(cmd)
 		#cmd = "echo {0} | bluez-simple-agent {1} {2}".format(pinCode, self.homePiOwner.clientHciInterface, self.macAddress)

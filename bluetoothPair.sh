@@ -5,15 +5,15 @@ set deviceAddress [lindex $argv 0]
 set pinCode [lindex $argv 1]
 set btInterfaceAddress [lindex $argv 2]
 
-set timout 30 # Wait as much as 30 seconds for a response.
+set timeout 30 
 
 spawn sudo bluetoothctl -a
+expect "Agent registered"
 expect -re $prompt
 send "select $btInterfaceAddress\r"
-sleep 1
 expect -re $prompt
 send "remove $deviceAddress\r"
-sleep 1
+expect "Device"
 expect -re $prompt
 send "scan on\r"
 send_user "\nScanning\r"
@@ -26,17 +26,25 @@ expect {
 	"Changing $deviceAddress trust succeeded" { 
 		send "pair $deviceAddress\r"
 		expect {
-				"Request PIN code" { 
-					send "$pinCode\r" 
-					send "quit\r"
-
+				"Attempting to pair with $deviceAddress" {
+					expect {
+						"Request PIN code" {
+							send "$pinCode\r"
+							expect -re $prompt
+							send "quit\r"	
+						}
+						"Failed to pair:" {
+							send "quit\r"
+						}
+					}
 				}
+				
 				"Device $deviceAddress not available" { 
 					send_user "\nDevice Not Found\r"
 					send "quit\r"
 				}
 		}
 	}
-	"*" { send "quit\r"}
+	"Device $deviceAddress not available" { send "quit\r"}
 }
 expect eof
