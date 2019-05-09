@@ -1,4 +1,5 @@
 import threading
+import commands
 
 class HomeDevice(object): #threading.Thread):
 
@@ -24,11 +25,15 @@ class HomeDevice(object): #threading.Thread):
 	# like data received, disconnect
 	devListener = None
 
+	# Owner HomePi
+	homePiOwner = None
+	
 	# Is running
 	bRunning = True
 
-	def __init__(self, devId, mac, devClass, devCat, userId):
+	def __init__(self, homePiOwner, devId, mac, devClass, devCat, userId):
 		#threading.Thread.__init__(self)
+		self.homePiOwner = homePiOwner
 		self.devId = devId
 		self.macAddress = mac
 		self.devClass = devClass
@@ -151,6 +156,16 @@ class HomeDevice(object): #threading.Thread):
 		self.devListener.onDeviceDataReceived(self, data)
 		pass
 
+	# Creates a pair record for the device and the HomePi
+	def pairDevice(self, pinCode):
+		cmd = "sudo echo "{0} {1}" >> /var/lib/bluetooth/{2}/pincodes".format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
+		status, output = commands.getstatusoutput(cmd)
+		cmd = "echo {0} | bluez-simple-agent {1} {2}".format(pinCode, self.homePiOwner.clientHciInterface, self.macAddress)
+		status, output = commands.getstatusoutput(cmd)
+		cmd = "bluez-test-device trusted {0} yes".format(self.macAddress)
+		status, output = commands.getstatusoutput(cmd)
+		pass
+		
 	# Stop listening
 	def stopListening(self):
 		self.bRunning

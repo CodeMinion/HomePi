@@ -29,6 +29,7 @@ class HomePiManager(object):
 
 	# Lock
 	threadLock = None
+	threadLock = None
 
 	# Path used to configure the HomePi
 	configFilePath = None 
@@ -76,6 +77,8 @@ class HomePiManager(object):
 	# to serve as a server.  
 	clientInterfaceMac = ''
 	serverInterfaceMac = ''
+	clientHciInterface = ''
+	serverHciInterface = ''
 
 	# List of registered devices
 	registeredDevices = []
@@ -232,6 +235,9 @@ class HomePiManager(object):
 		json_data[self.KEY_CLIENT_INTERFACE_MAC] = macs[0]
 		json_data[self.KEY_SERVER_INTERFACE_MAC] = macs[1]
 		
+		self.clientHciInterface = macs[2]
+		self.serverHciInterface = macs[3]
+		
 		# Get the Mac for the interface to use to connect 
 		# with registered devices.
 		self.clientInterfaceMac = json_data[self.KEY_CLIENT_INTERFACE_MAC]
@@ -261,7 +267,7 @@ class HomePiManager(object):
 			devUserId = device['userId']
 		
 			# Create device Instance.
-			homeDev = HomeDevice(devId, devMac, devClass, devCat, devUserId)
+			homeDev = HomeDevice(self, devId, devMac, devClass, devCat, devUserId)
 			# Instanciate the device interpreter
 			devInterpreter = getattr(mod, interName)(homeDev)
 
@@ -739,11 +745,13 @@ class HomePiManager(object):
 	# Requests the MAC Addresses of the Bluetooth adapters.
 	# @returns A tubple containg clientMac, serverMac. 
 	def getHomePiBluetoothInterfaces(self):
-		# MAC used to connect peripherals. 
-		clientMac = self.getBtInterfaceMac("hci1")
+		# MAC used to connect peripherals.
+		clientHci = "hci0"
+		clientMac = self.getBtInterfaceMac(clientHci)
 		# MAC used to listener for mobile clients. 
-		serverMac = self.getBtInterfaceMac("hci0")
-		return (clientMac, serverMac)
+		serverHci = "hci1"
+		serverMac = self.getBtInterfaceMac(serverHci)
+		return (clientMac, serverMac, clientHci, serverHci)
 		
 		
 	# Helper function to retreive device the PI BT MAC	
