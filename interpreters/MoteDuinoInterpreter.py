@@ -91,6 +91,8 @@ class MoteDuinoInterpreter(object):
 			print btErr
 			print 'FAIL: {0}:{1} - Error trying to connect to MoteDuino server. Make sure the Raspberry Pi is paired with it and that the server is running.'.format(self.server.getDeviceId(), self.server.getDeviceMac())
 			self.bmSocket = None
+			# Try to pair.
+			self.server.pairDevice("1234")
 			return -1
 
 	# REUIQRED
