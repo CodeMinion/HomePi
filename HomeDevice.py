@@ -1,5 +1,6 @@
 import threading
 import commands
+import os
 
 class HomeDevice(object): #threading.Thread):
 
@@ -166,6 +167,14 @@ class HomeDevice(object): #threading.Thread):
 		#status, output = commands.getstatusoutput(cmd)
 		#cmd = "bluez-test-device trusted {0} yes".format(self.macAddress)
 		#status, output = commands.getstatusoutput(cmd)
+		pass
+	
+	def isPaired(self):
+		#Check if a folder exists if the following directory exists:
+		#  /var/lib/bluetooth/{self.homePiOwner.clientInterfaceMac}/{self.macAddress}
+		pairRecordPath = '/var/lib/bluetooth/{0}/{1}'.format(self.homePiOwner.clientInterfaceMac, self.macAddress)
+		exists = os.path.isdir(pairRecordPath)
+		return exists
 		pass
 		
 	# Stop listening
