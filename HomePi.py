@@ -746,10 +746,10 @@ class HomePiManager(object):
 	# @returns A tubple containg clientMac, serverMac. 
 	def getHomePiBluetoothInterfaces(self):
 		# MAC used to connect peripherals.
-		clientHci = "hci0"
+		clientHci = "hci1"
 		clientMac = self.getBtInterfaceMac(clientHci)
 		# MAC used to listener for mobile clients. 
-		serverHci = "hci1"
+		serverHci = "hci0"
 		serverMac = self.getBtInterfaceMac(serverHci)
 		return (clientMac, serverMac, clientHci, serverHci)
 		

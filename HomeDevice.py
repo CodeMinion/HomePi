@@ -172,7 +172,7 @@ class HomeDevice(object): #threading.Thread):
 	def isPaired(self):
 		#Check if a folder exists if the following directory exists:
 		#  /var/lib/bluetooth/{self.homePiOwner.clientInterfaceMac}/{self.macAddress}
-		pairRecordPath = '/var/lib/bluetooth/{0}/{1}'.format(self.homePiOwner.clientInterfaceMac, self.macAddress)
+		pairRecordPath = '/var/lib/bluetooth/{0}/{1}/'.format(self.homePiOwner.clientInterfaceMac, self.macAddress)
 		exists = os.path.isdir(pairRecordPath)
 		return exists
 		pass
