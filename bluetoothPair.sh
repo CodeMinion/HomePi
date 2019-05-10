@@ -21,30 +21,29 @@ expect "Device $deviceAddress *"
 send_user "\nDone scanning\r"
 send "scan off\r"
 expect "Controller"
-send "trust $deviceAddress\r"
+send "pair $deviceAddress\r"
 expect {
-	"Changing $deviceAddress trust succeeded" { 
-		send "pair $deviceAddress\r"
-		expect {
-				"Attempting to pair with $deviceAddress" {
-					expect {
-						"Request PIN code" {
-							send "$pinCode\r"
-							expect -re $prompt
-							send "quit\r"	
-						}
-						"Failed to pair:" {
-							send "quit\r"
-						}
-					}
+		"Attempting to pair with $deviceAddress" {
+			expect {
+				"Request PIN code" {
+					send "$pinCode\r"
+					expect -re $prompt
+					send "trust $deviceAddress\r"
+					expect "Changing $deviceAddress trust succeeded" 
+					expect -re $prompt
+					send "quit\r"	
 				}
-				
-				"Device $deviceAddress not available" { 
-					send_user "\nDevice Not Found\r"
+				"Failed to pair:" {
 					send "quit\r"
 				}
+			}
 		}
-	}
-	"Device $deviceAddress not available" { send "quit\r"}
+		
+		"Device $deviceAddress not available" { 
+			send_user "\nDevice Not Found\r"
+			send "quit\r"
+		}
+		
+		"Device $deviceAddress not available" { send "quit\r"}
 }
 expect eof

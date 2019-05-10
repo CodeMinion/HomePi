@@ -34,8 +34,7 @@ sudo /etc/init.d/bluetooth restart
 sleep 15
 
 # Make HomePi discoverable.
-#sudo hciconfig hci0 piscan
-sudo hciconfig hci1 piscan
+sudo hciconfig hci0 piscan
 
 # Change to your user home dir.
 cd /
