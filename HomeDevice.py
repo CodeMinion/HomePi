@@ -21,18 +21,23 @@ class HomeDevice(object): #threading.Thread):
 	# the device. Meant to translate commands 
 	# into device specific instructions
 	devInterpreter = None
+	# Pin code used for the device
+	pinCode = None
+	# User Key of the owner of this Device
+	userKey = None
+	
 	# Reference to the device listener
 	# used to listen to changes in the device
 	# like data received, disconnect
 	devListener = None
-
+	
 	# Owner HomePi
 	homePiOwner = None
 	
 	# Is running
 	bRunning = True
 
-	def __init__(self, homePiOwner, devId, mac, devClass, devCat, userId):
+	def __init__(self, homePiOwner, devId, mac, devClass, devCat, devPinCode, userId):
 		#threading.Thread.__init__(self)
 		self.homePiOwner = homePiOwner
 		self.devId = devId
@@ -40,6 +45,8 @@ class HomeDevice(object): #threading.Thread):
 		self.devClass = devClass
 		self.Category = devCat
 		self.devUserIdentifier = userId
+		self.pinCode = devPinCode
+		self.userKey = userId
 		#self.setDaemon(True)
 		#pass
 
@@ -168,7 +175,13 @@ class HomeDevice(object): #threading.Thread):
 		#cmd = "bluez-test-device trusted {0} yes".format(self.macAddress)
 		#status, output = commands.getstatusoutput(cmd)
 		pass
-	
+
+	# Convenience method for paring which uses the devices recorded PIN
+	def pairDevice(self):
+		if self.requiresPair():
+			self.pairDevice(self.pinCode)
+		
+	# Returns true if the device is paired
 	def isPaired(self):
 		#Check if a folder exists if the following directory exists:
 		#  /var/lib/bluetooth/{self.homePiOwner.clientInterfaceMac}/{self.macAddress}
@@ -176,6 +189,10 @@ class HomeDevice(object): #threading.Thread):
 		exists = os.path.isdir(pairRecordPath)
 		return exists
 		pass
+	
+	# Returns true if the device requires pairing
+	def requiresPair(self):
+		return self.pinCode not None and len(self.pinCode) > 0
 		
 	# Stop listening
 	def stopListening(self):

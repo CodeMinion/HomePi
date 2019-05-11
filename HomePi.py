@@ -158,6 +158,7 @@ class HomePiManager(object):
 	KEY_HOME_PI_ID = 'homePiId'
 	KEY_WIFI_SSID = 'ssid'
 	KEY_WIFI_PSK = 'psk'
+	KEY_PIN_CODE = 'pinCode'
 	
 	# TODO Add missing keys 
 	
@@ -258,16 +259,22 @@ class HomePiManager(object):
 			interName = device['interpreter']
 			# Import the interpreter class
 			mod = __import__(self.INTERPRETER_DIR+'.'+interName, fromlist=[interName])
-		
-
-			devId = device['id']
+	
+			# Ensure IDs are treated as strings
+			devId = '{0}'.format(device['id'])
 			devMac = device['mac']
 			devClass = device['class']
 			devCat = device['category']
 			devUserId = device['userId']
+			devPinCode = None
+			
+			if self.KEY_PIN_CODE in device:
+				devPinCode = '{0}'.format(device[self.KEY_PIN_CODE])
+			
+			#TODO Handle Pairing data.
 		
 			# Create device Instance.
-			homeDev = HomeDevice(self, devId, devMac, devClass, devCat, devUserId)
+			homeDev = HomeDevice(self, devId, devMac, devClass, devCat, devPinCode, devUserId)
 			# Instanciate the device interpreter
 			devInterpreter = getattr(mod, interName)(homeDev)
 
@@ -331,6 +338,9 @@ class HomePiManager(object):
 		commandsArr = dataString.split('\n')
 		#commandStr = commandsArr[0]
 		for commandStr in commandsArr:
+			if len(commandStr) == 0:
+				continue
+				
 			self.processDataHelper(commandStr)
 	
 
@@ -407,6 +417,21 @@ class HomePiManager(object):
 				firmware_remote = "origin"
 				cmd = "git pull -r {0} {1}".format(firmware_remote, firmware_branch)
 				status, output = commands.getstatusoutput(cmd)
+				
+				# TODO Move to helper function.
+				# Update permissions
+				script = "bluetoothPair.sh"
+				cmd = "chmod 755 {0}".format(script)
+				status, output = commands.getstatusoutput(cmd)
+				
+				script = "HomePi.py"
+				cmd = "chmod 755 {0}".format(script)
+				status, output = commands.getstatusoutput(cmd)
+				
+				script = "home_pi_boot.sh"
+				cmd = "chmod 755 {0}".format(script)
+				status, output = commands.getstatusoutput(cmd)
+				
 				# TODO Handle the status to better notify the users
 				# Notify clients of Configuration Complete.
 				cmdLine = '{0}'.format(self.INFO_FIRMWARE_UPDATE_DONE)
