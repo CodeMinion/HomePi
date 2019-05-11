@@ -5,7 +5,7 @@ set deviceAddress [lindex $argv 0]
 set pinCode [lindex $argv 1]
 set btInterfaceAddress [lindex $argv 2]
 
-set timeout 30 
+set timeout 60 
 
 spawn sudo bluetoothctl -a
 expect "Agent registered"
