@@ -72,6 +72,11 @@ class MoteDuinoInterpreter(object):
 	def connect(self):
 		# Do some exception handling here.
 		try :
+			
+			if self.server.requiresPair() and not self.server.isPaired():
+				# Try to pair. HC-06 default pin: 1234
+				self.server.pairDevice()
+			
 			# If there is no socket
 			# probably something went wrong 
 			# during the creation so try to 

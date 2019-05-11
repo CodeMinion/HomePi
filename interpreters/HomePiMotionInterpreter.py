@@ -52,7 +52,7 @@ class HomePiMotionInterpreter(DefaultDelegate):
 			# Connect to the motion sensor using hci1 interface (Note: Consider changing this to be better controlled)
 			# 0 - /dev/hci0
 			# 1 - /dev/hci1
-			self.motionSensorPeripheral = Peripheral(deviceMac, ADDR_TYPE_RANDOM , 1)
+			self.motionSensorPeripheral = Peripheral(deviceMac, ADDR_TYPE_RANDOM , 0)
 			
 			self.motionSensorPeripheral.setDelegate(self)
 			

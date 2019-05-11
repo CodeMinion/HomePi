@@ -1,4 +1,6 @@
 import threading
+import commands
+import os
 
 class HomeDevice(object): #threading.Thread):
 
@@ -19,21 +21,32 @@ class HomeDevice(object): #threading.Thread):
 	# the device. Meant to translate commands 
 	# into device specific instructions
 	devInterpreter = None
+	# Pin code used for the device
+	pinCode = None
+	# User Key of the owner of this Device
+	userKey = None
+	
 	# Reference to the device listener
 	# used to listen to changes in the device
 	# like data received, disconnect
 	devListener = None
-
+	
+	# Owner HomePi
+	homePiOwner = None
+	
 	# Is running
 	bRunning = True
 
-	def __init__(self, devId, mac, devClass, devCat, userId):
+	def __init__(self, homePiOwner, devId, mac, devClass, devCat, devPinCode, userId):
 		#threading.Thread.__init__(self)
+		self.homePiOwner = homePiOwner
 		self.devId = devId
 		self.macAddress = mac
 		self.devClass = devClass
 		self.Category = devCat
 		self.devUserIdentifier = userId
+		self.pinCode = devPinCode
+		self.userKey = userId
 		#self.setDaemon(True)
 		#pass
 
@@ -151,6 +164,39 @@ class HomeDevice(object): #threading.Thread):
 		self.devListener.onDeviceDataReceived(self, data)
 		pass
 
+	# Creates a pair record for the device and the HomePi
+	def pairDevice(self, pinCode = None):
+		if pinCode is None:
+			pinCode = self.pinCode
+	
+		# If device is already paired, do nothing.
+		if self.isPaired():
+			return 
+			
+		#cmd = 'sudo echo "{0} {1}" >> /var/lib/bluetooth/{2}/pincodes'.format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
+		#status, output = commands.getstatusoutput(cmd)
+		cmd = "./bluetoothPair.sh {0} {1} {2}".format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
+		status, output = commands.getstatusoutput(cmd)
+		#cmd = "echo {0} | bluez-simple-agent {1} {2}".format(pinCode, self.homePiOwner.clientHciInterface, self.macAddress)
+		#status, output = commands.getstatusoutput(cmd)
+		#cmd = "bluez-test-device trusted {0} yes".format(self.macAddress)
+		#status, output = commands.getstatusoutput(cmd)
+		pass
+	
+	# Returns true if the device is paired
+	def isPaired(self):
+		#Check if a folder exists if the following directory exists:
+		#  /var/lib/bluetooth/{self.homePiOwner.clientInterfaceMac}/{self.macAddress}
+		pairRecordPath = '/var/lib/bluetooth/{0}/{1}/'.format(self.homePiOwner.clientInterfaceMac, self.macAddress)
+		exists = os.path.isdir(pairRecordPath)
+		return exists
+		pass
+	
+	# Returns true if the device requires pairing
+	def requiresPair(self):
+		pairReq = (not self.pinCode is None) and len(self.pinCode) > 0
+		return pairReq
+		
 	# Stop listening
 	def stopListening(self):
 		self.bRunning
