@@ -417,11 +417,7 @@ class HomePiManager(object):
 				firmware_remote = "origin"
 				cmd = "git pull -r {0} {1}".format(firmware_remote, firmware_branch)
 				status, output = commands.getstatusoutput(cmd)
-				
-				# TODO Move to helper function.
-				# Update permissions
-				self.updatePermissionForScripts()
-				
+								
 				# TODO Handle the status to better notify the users
 				# Notify clients of Configuration Complete.
 				cmdLine = '{0}'.format(self.INFO_FIRMWARE_UPDATE_DONE)
@@ -465,26 +461,6 @@ class HomePiManager(object):
 				pass
 
 
-		pass
-
-	# Update the permission for scripts needed 
-	# by the HomePi.
-	def updatePermissionForScripts(self):
-		script = "bluetoothPair.sh"
-		cmd = "chmod 755 {0}".format(script)
-		status, output = commands.getstatusoutput(cmd)
-		
-		script = "bluetoothUnpair.sh"
-		cmd = "chmod 755 {0}".format(script)
-		status, output = commands.getstatusoutput(cmd)
-		
-		script = "HomePi.py"
-		cmd = "chmod 755 {0}".format(script)
-		status, output = commands.getstatusoutput(cmd)
-		
-		script = "home_pi_boot.sh"
-		cmd = "chmod 755 {0}".format(script)
-		status, output = commands.getstatusoutput(cmd)
 		pass
 		
 	# Attempt to disconnect from all connected clients
