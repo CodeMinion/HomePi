@@ -95,6 +95,10 @@ class MoteDuinoInterpreter(object):
 		except bluetooth.btcommon.BluetoothError as btErr:
 			print btErr
 			print 'FAIL: {0}:{1} - Error trying to connect to MoteDuino server. Make sure the Raspberry Pi is paired with it and that the server is running.'.format(self.server.getDeviceId(), self.server.getDeviceMac())
+			errCode = eval(btError[0])[0]
+			if errCode == 111:
+				self.server.unpairDevice()
+				
 			self.bmSocket = None
 			return -1
 
