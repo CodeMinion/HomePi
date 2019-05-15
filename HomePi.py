@@ -420,17 +420,7 @@ class HomePiManager(object):
 				
 				# TODO Move to helper function.
 				# Update permissions
-				script = "bluetoothPair.sh"
-				cmd = "chmod 755 {0}".format(script)
-				status, output = commands.getstatusoutput(cmd)
-				
-				script = "HomePi.py"
-				cmd = "chmod 755 {0}".format(script)
-				status, output = commands.getstatusoutput(cmd)
-				
-				script = "home_pi_boot.sh"
-				cmd = "chmod 755 {0}".format(script)
-				status, output = commands.getstatusoutput(cmd)
+				self.updatePermissionForScripts()
 				
 				# TODO Handle the status to better notify the users
 				# Notify clients of Configuration Complete.
@@ -477,6 +467,26 @@ class HomePiManager(object):
 
 		pass
 
+	# Update the permission for scripts needed 
+	# by the HomePi.
+	def updatePermissionForScripts(self):
+		script = "bluetoothPair.sh"
+		cmd = "chmod 755 {0}".format(script)
+		status, output = commands.getstatusoutput(cmd)
+		
+		script = "bluetoothUnpair.sh"
+		cmd = "chmod 755 {0}".format(script)
+		status, output = commands.getstatusoutput(cmd)
+		
+		script = "HomePi.py"
+		cmd = "chmod 755 {0}".format(script)
+		status, output = commands.getstatusoutput(cmd)
+		
+		script = "home_pi_boot.sh"
+		cmd = "chmod 755 {0}".format(script)
+		status, output = commands.getstatusoutput(cmd)
+		pass
+		
 	# Attempt to disconnect from all connected clients
 	def disconnectFromClients(self, connectedClientsThread):
 		for client in connectedClientsThread:

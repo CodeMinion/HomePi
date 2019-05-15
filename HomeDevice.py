@@ -173,15 +173,14 @@ class HomeDevice(object): #threading.Thread):
 		if self.isPaired():
 			return 
 			
-		#cmd = 'sudo echo "{0} {1}" >> /var/lib/bluetooth/{2}/pincodes'.format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
-		#status, output = commands.getstatusoutput(cmd)
 		cmd = "./bluetoothPair.sh {0} {1} {2}".format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
 		status, output = commands.getstatusoutput(cmd)
-		#cmd = "echo {0} | bluez-simple-agent {1} {2}".format(pinCode, self.homePiOwner.clientHciInterface, self.macAddress)
-		#status, output = commands.getstatusoutput(cmd)
-		#cmd = "bluez-test-device trusted {0} yes".format(self.macAddress)
-		#status, output = commands.getstatusoutput(cmd)
 		pass
+	
+	def unpairDevice(self):
+		cmd = "./bluetoothUnpair.sh {0} {1}".format(self.macAddress, self.homePiOwner.clientInterfaceMac)
+		status, output = commands.getstatusoutput(cmd)
+		pass 
 	
 	# Returns true if the device is paired
 	def isPaired(self):
