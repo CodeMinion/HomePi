@@ -178,7 +178,7 @@ class HomeDevice(object): #threading.Thread):
 		pass
 	
 	def unpairDevice(self):
-		cmd = "./bluetoothUnpair.sh {0} {1} {2}".format(self.macAddress, pinCode, self.homePiOwner.clientInterfaceMac)
+		cmd = "./bluetoothUnpair.sh {0} {1}".format(self.macAddress, self.homePiOwner.clientInterfaceMac)
 		status, output = commands.getstatusoutput(cmd)
 		pass 
 	

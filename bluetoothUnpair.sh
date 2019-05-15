@@ -2,8 +2,7 @@
 
 set prompt "#"
 set deviceAddress [lindex $argv 0]
-set pinCode [lindex $argv 1]
-set btInterfaceAddress [lindex $argv 2]
+set btInterfaceAddress [lindex $argv 1]
 
 set timeout 60 
 
