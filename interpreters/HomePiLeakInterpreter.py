@@ -130,11 +130,11 @@ class HomePiLeakInterpreter(DefaultDelegate):
 			valueToSend = self.LEAK_NONE
 			
 			# Translate to Device Agnostic Values.
-			if(motionValue == 1):
+			if(leakValue == 1):
 				valueToSend = self.LEAK_DETECTED_TOP
-                        elif(motionValue == 2):
+                        elif(leakValue == 2):
                                 valueToSend = self.LEAK_DETECTED_BOTTOM
-                        elif(motionValue == 3):
+                        elif(leakValue == 3):
                                 valueToSend = self.LEAK_DETECTED_TOP | self.LEAK_DETECTED_BOTTOM
 			else: 
 				valueToSend = self.LEAK_NONE
