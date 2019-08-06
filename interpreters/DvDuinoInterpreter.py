@@ -94,6 +94,7 @@ class DvDuinoInterpreter(object):
 		except bluetooth.btcommon.BluetoothError as btError:
 			print 'FAIL: {0}:{1} - Error trying to connect to DVDuino server. Make sure the Raspberry Pi is paired with it and that the server is running.'.format(self.server.getDeviceId(), self.server.getDeviceMac())
 			errCode = eval(btError[0])[0]
+                        print 'Error {0}'.format(errCode)
 			if errCode == 111: # Device Rejected Connection
 				self.server.unpairDevice()
 			
