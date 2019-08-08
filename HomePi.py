@@ -38,6 +38,10 @@ class HomePiManager(object):
 	# Home Pi Id. Used to indentify
 	# with other HomePi
 	homePiId = ''
+	
+	# ID under which this Home Pi is registered
+	# with the backend. 
+	homePiRegistrationId = None
 
 	# Directory name where all the interpreter
 	# implementations are kept. 
@@ -159,6 +163,9 @@ class HomePiManager(object):
 	KEY_WIFI_SSID = 'ssid'
 	KEY_WIFI_PSK = 'psk'
 	KEY_PIN_CODE = 'pinCode'
+	KEY_BACKEND_REGISTRATION_ID = 'registrationId'
+	KEY_API_KEY = 'apiKey'
+	KEY_ACTIVITY_ENDPOINT = 'deviceActivityEndpoint'
 	
 	# TODO Add missing keys 
 	
@@ -168,6 +175,11 @@ class HomePiManager(object):
 
 	feedbackGlow = 32
 
+	# Endpoint to which device activity will be posted.
+	activityEndpointUrl = ""
+	# API key to post to the backend.
+	apiKey = ""
+	
 	# Helper to load the configuraiton file.
 	# If the configuration no configuration file is available
 	# a default file will be loaded. 
@@ -253,6 +265,15 @@ class HomePiManager(object):
 	
 		# List of registered devices in the HomePi
 		self.registeredDevices = []
+		
+		if self.KEY_BACKEND_REGISTRATION_ID in json_data:
+			self.homePiRegistrationId = '{0}'.format(json_data[self.KEY_BACKEND_REGISTRATION_ID])
+
+		if self.KEY_API_KEY in json_data:
+			self.apiKey = '{0}'.format(json_data[self.KEY_API_KEY])
+
+			if self.KEY_ACTIVITY_ENDPOINT in json_data:
+			self.activityEndpointUrl = '{0}'.format(json_data[self.KEY_ACTIVITY_ENDPOINT])
 
 		for device in json_devs:
 			# Get the interpreter name
@@ -702,6 +723,11 @@ class HomePiManager(object):
 	def onDeviceDataReceived(self, device, deviceData):
 		print 'Data - {0} - From {1}'.format(deviceData, device.getDeviceMac())
 		self.notifyClientsDataRead(device.getDeviceId(),deviceData)	
+		if self.homePiRegistrationId is not None:
+			# Notify backend of device data.
+			# TODO Get home pi ID and use here.
+			deviceAct = DeviceActivityThread(self.activityEndpointUrl, self.apiKey, self.homePiRegistrationId, device, deviceData)
+			deviceAct.start()
 		pass
 
 	
