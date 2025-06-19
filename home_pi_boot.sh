@@ -11,7 +11,7 @@
 # chmod 755 home_pi_boot.sh
 #
 # 2 - Add to crontb 
-# sudo contrab -e
+# sudo crontab -e
 # @reboot sh path_to_this scrip
 # 
 # Ex. @reboot sudo sh /home/pi/HomePi/home_pi_boot.sh > /home/pi/HomePi/cronlogs 2>&1
